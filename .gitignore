@@ -1,0 +1,36 @@
+*/node_modules
+
+# env file
+.env
+.env.*
+
+# firebase
+service-account-file.json
+
+# docker
+/docker-volume/*
+
+#######################################################
+# internal
+#######################################################
+/internal/*/tmp
+/internal/*/test
+
+#######################################################
+# web
+#######################################################
+/web/.pnp
+/web/.pnp.js
+
+# testing
+/web/coverage
+
+# production
+/web/build
+
+# misc
+/web/.DS_Store
+
+/web/npm-debug.log*
+/web/yarn-debug.log*
+/web/yarn-error.log*

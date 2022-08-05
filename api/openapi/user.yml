@@ -1,0 +1,66 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: "CM Catalogue - User API"
+  description: "A service for managing user."
+servers:
+  - url: http://localhost/api/v1/user
+security:
+  - bearerAuth: []
+paths:
+  /getCurrentUser:
+    get:
+      operationId: getCurrentUser
+      summary: "Retrieve user info"
+      tags:
+        - user
+      responses:
+        "200":
+          description: "Return user info."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Unexpected:
+      description: "Unexpected error."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModelError"
+
+  schemas:
+    User:
+      type: object
+      required: [id, username, name]
+      properties:
+        id: 
+          type: string
+          example: "fb72acd4-8519-43ad-8bfe-c3471e4b8948"
+        username: 
+          type: string
+          example: "admin@example.com"
+        name: 
+          type: string
+          example: "Brian"
+
+    ModelError:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string
