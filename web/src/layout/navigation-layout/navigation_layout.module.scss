@@ -1,0 +1,39 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+.header-container {
+  :global(a) {
+    text-decoration: none;
+    color: #000;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  :global(.dropdown-menu) {
+    background-color: $yellow-400;
+  }
+
+  :global(.dropdown-item) {
+    &:hover {
+      background-color: $yellow-500;
+    }
+
+    a:hover {
+      color: #000;
+    }
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .sign-out {
+    cursor: pointer;
+  }
+}

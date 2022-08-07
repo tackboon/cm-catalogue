@@ -4,7 +4,10 @@ info:
   title: "CM Catalogue - User API"
   description: "A service for managing user."
 servers:
-  - url: http://localhost/api/v1/user
+  - url: http://{hostname}/api/v1/users
+    variables:
+      hostname:
+        default: localhost:8080
 security:
   - bearerAuth: []
 paths:
@@ -21,6 +24,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         default:
           $ref: "#/components/responses/Unexpected"
 
@@ -32,6 +37,8 @@ components:
       bearerFormat: JWT
 
   responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
     Unexpected:
       description: "Unexpected error."
       content:
@@ -42,17 +49,17 @@ components:
   schemas:
     User:
       type: object
-      required: [id, username, name]
+      required: [email, display_name, role]
       properties:
-        id: 
+        email: 
           type: string
-          example: "fb72acd4-8519-43ad-8bfe-c3471e4b8948"
-        username: 
+          example: "tack@example.com"
+        display_name: 
           type: string
-          example: "admin@example.com"
-        name: 
+          example: "Tack"
+        role: 
           type: string
-          example: "Brian"
+          example: "admin"
 
     ModelError:
       type: object
