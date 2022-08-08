@@ -30,6 +30,7 @@ func SetMiddlewares(r *chi.Mux) {
 		middleware.RequestID,
 		middleware.RealIP,
 		middleware.Recoverer,
+		middleware.NoCache,
 		middleware.SetHeader("X-Content-Type-Options", "nosniff"),
 		middleware.SetHeader("X-Frame-Options", "deny"),
 	)
