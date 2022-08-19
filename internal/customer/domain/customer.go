@@ -54,7 +54,7 @@ func (c Customer) IsValidName() error {
 }
 
 func (c Customer) IsValidContact() error {
-	if c.Contact != nil {
+	if c.Contact != nil && *c.Contact != "" {
 		match, err := regexp.MatchString("^(01)[02-46-9][0-9]{7}$|^(01)[1][0-9]{8}$", *c.Contact)
 		if err != nil {
 			return err
