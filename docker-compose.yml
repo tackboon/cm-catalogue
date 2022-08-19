@@ -68,7 +68,8 @@ services:
       - "8082:8080"
     environment:
       - 'URLS=[
-        { url: "http://localhost:8080/openapi/user.yml", name: "User" }
+        { url: "http://localhost:8080/openapi/user.yml", name: "User" },
+        { url: "http://localhost:8080/openapi/customer.yml", name: "Customer" },
         ]'
 
   ################################################################
@@ -88,7 +89,7 @@ services:
       - .env
 
   ################################################################
-  # Application service - catalogue (HTTP Protocol)
+  # Application service - user (HTTP Protocol)
   ################################################################
   cm-user-http:
     build:
@@ -104,3 +105,23 @@ services:
     environment:
       - "SERVER_TO_RUN=http"
       - "PORT=5000"
+
+  ################################################################
+  # Application service - customer (HTTP Protocol)
+  ################################################################
+  cm-customer-http:
+    build:
+      context: docker/app
+    container_name: cm-customer-http
+    hostname: cm-customer-http
+    volumes:
+      - ./internal:/internal
+      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
+    working_dir: /internal/customer
+    env_file:
+      - .env
+    environment:
+      - "SERVER_TO_RUN=http"
+      - "PORT=5000"
+    depends_on:
+      - postgres

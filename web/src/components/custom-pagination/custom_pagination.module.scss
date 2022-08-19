@@ -1,0 +1,36 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins/breakpoints";
+
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
+
+  @include media-breakpoint-up(lg) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .pagination {
+    margin-top: 0.5rem;
+
+    @include media-breakpoint-up(lg) {
+      margin-top: 0;
+    }
+
+    .prev,
+    .next {
+      height: 2.8rem;
+    }
+
+    .prev {
+      border-radius: 10px 0 0 10px;
+    }
+
+    .next {
+      border-radius: 0 10px 10px 0;
+    }
+  }
+}

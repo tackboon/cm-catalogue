@@ -6,4 +6,4 @@ development:
   password: postgres
   host: localhost
   port: 5433
-  pool: 5
+  pool: 10

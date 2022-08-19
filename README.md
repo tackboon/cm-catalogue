@@ -19,7 +19,7 @@ Open web browser to visit:
 * PGAdmin: [http://localhost:8081/](http://localhost:8081/)
     - username: admin@example.com
     - password: postgres
-* SwaggerUI: [http://localhost:8083/](http://localhost:8083/)
+* SwaggerUI: [http://localhost:8082/](http://localhost:8082/)
 
 ### Prerequisites
 

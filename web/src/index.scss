@@ -1,6 +1,7 @@
 @import "~@uppy/core/dist/style.css";
 @import "~@uppy/dashboard/dist/style.css";
 @import "~bootstrap/scss/bootstrap";
+@import "~react-datepicker/dist/react-datepicker.css";
 
 body {
   margin: 0;
@@ -16,7 +17,7 @@ code {
 
 /* custom scrollbar */
 ::-webkit-scrollbar {
-  width: 20px;
+  width: 15px;
 }
 
 ::-webkit-scrollbar-track {
@@ -25,7 +26,7 @@ code {
 
 ::-webkit-scrollbar-thumb {
   background-color: #d6dee1;
-  border-radius: 20px;
+  border-radius: 10px;
   border: 6px solid transparent;
   background-clip: content-box;
 }

@@ -36,4 +36,14 @@
   .sign-out {
     cursor: pointer;
   }
+
+  .user-icon {
+    font-size: 1.3rem;
+    margin-right: 0.2rem;
+  }
+}
+
+.content-wrapper {
+  overflow: auto;
+  height: calc(100vh - 76px);
 }

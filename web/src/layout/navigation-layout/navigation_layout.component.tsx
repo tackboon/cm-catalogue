@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Outlet, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { BsPersonCircle } from "react-icons/bs";
 
 import { selectCurrentUser } from "../../store/user/user.selector";
 import { signOutStart } from "../../store/user/user.action";
@@ -55,8 +56,15 @@ const NavigationLayout = () => {
                   </Nav.Link>
                 </Nav>
 
-                <Nav>
-                  <NavDropdown title={currentUser.displayName}>
+                <Nav className="d-none d-lg-block">
+                  <NavDropdown
+                    title={
+                      <span>
+                        <BsPersonCircle className={styles["user-icon"]} />
+                        {currentUser.displayName}
+                      </span>
+                    }
+                  >
                     <NavDropdown.Item as="div">
                       <span
                         className={styles["sign-out"]}
@@ -66,6 +74,17 @@ const NavigationLayout = () => {
                       </span>
                     </NavDropdown.Item>
                   </NavDropdown>
+                </Nav>
+
+                <Nav className="d-lg-none">
+                  <Nav.Link>
+                    <span
+                      className={styles["sign-out"]}
+                      onClick={() => dispatch(signOutStart())}
+                    >
+                      Sign Out
+                    </span>
+                  </Nav.Link>
                 </Nav>
               </>
             ) : (
@@ -82,7 +101,9 @@ const NavigationLayout = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Outlet />
+      <div className={styles["content-wrapper"]}>
+        <Outlet />
+      </div>
     </>
   );
 };

@@ -13,6 +13,10 @@ export enum USER_LOADING_TYPES {
   SIGN_IN = "loading/SIGN_In",
 }
 
+export enum USER_ERROR_TYPES {
+  SIGN_IN = "error/SIGN_In",
+}
+
 export type UserData = {
   email: string;
   displayName: string;
