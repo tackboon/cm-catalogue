@@ -11,6 +11,7 @@ import Home from "./pages/home/home.component";
 import SignIn from "./pages/sign-in/sign_in.component";
 import Category from "./pages/category/category.component";
 import Customer from "./pages/customer/customer.component";
+import CustomToast from "./components/custom-toast/custom_toast.component";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -32,30 +33,33 @@ const App = () => {
   };
 
   return (
-    <Routes>
-      <Route path="/" element={<NavigationLayout />}>
-        <Route index element={<Home />} />
-        <Route path="auth/sign-in" element={<SignIn />} />
-        <Route
-          path="category"
-          element={
-            <ProtectedRoute
-              {...defaultProtectedRouteProps}
-              outlet={<Category />}
-            />
-          }
-        />
-        <Route
-          path="customers"
-          element={
-            <ProtectedRoute
-              {...defaultProtectedRouteProps}
-              outlet={<Customer />}
-            />
-          }
-        />
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<NavigationLayout />}>
+          <Route index element={<Home />} />
+          <Route path="auth/sign-in" element={<SignIn />} />
+          <Route
+            path="category"
+            element={
+              <ProtectedRoute
+                {...defaultProtectedRouteProps}
+                outlet={<Category />}
+              />
+            }
+          />
+          <Route
+            path="customers"
+            element={
+              <ProtectedRoute
+                {...defaultProtectedRouteProps}
+                outlet={<Customer />}
+              />
+            }
+          />
+        </Route>
+      </Routes>
+      <CustomToast />
+    </>
   );
 };
 

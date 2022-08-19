@@ -50,11 +50,9 @@ export function initErrorState<T>(types: T) {
   const error = {};
 
   Object.values(types).forEach((type) => {
-    if (/([A-Z_])+_FAILED$/.test(type)) {
-      Object.assign(error, {
-        [type]: "",
-      });
-    }
+    Object.assign(error, {
+      [type]: "",
+    });
   });
 
   return error;

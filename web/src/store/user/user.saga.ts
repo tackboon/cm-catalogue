@@ -13,6 +13,7 @@ import {
   signInFailed,
   signInSuccess,
   signOutFailed,
+  signOutStart,
   signOutSuccess,
 } from "./user.action";
 import { USER_ACTION_TYPES, USER_LOADING_TYPES } from "./user.types";
@@ -34,8 +35,9 @@ export function* updateSession({ payload: token }: SetCurrentSession) {
     }
   } catch (error) {
     yield* put(
-      signInFailed("Failed to load auth session. Please try again later.")
+      signInFailed("Failed to get user data. Please try again later.")
     );
+    yield* put(signOutStart());
   }
 }
 

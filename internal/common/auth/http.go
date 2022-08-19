@@ -43,11 +43,21 @@ func (a FirebaseAuthHttp) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
+		role := token.Claims["role"]
+		if role == nil {
+			role = "user"
+		}
+
+		displayName := token.Claims["name"]
+		if displayName == nil {
+			displayName = "Anonymous"
+		}
+
 		ctx = context.WithValue(ctx, userContextKey, User{
 			UUID:        token.UID,
 			Email:       token.Claims["email"].(string),
-			Role:        token.Claims["role"].(string),
-			DisplayName: token.Claims["name"].(string),
+			Role:        role.(string),
+			DisplayName: displayName.(string),
 		})
 		r = r.WithContext(ctx)
 

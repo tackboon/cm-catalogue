@@ -1,0 +1,25 @@
+Table customers {
+  id serial [pk, increment]
+  code varchar [null]
+  name varchar [unique]
+  contact varchar [null]
+  relationship varchar
+  address varchar [null]
+  postcode varchar [null]
+  city varchar [null]
+  state varchar [null]
+  total_unbilled_amount numeric [default: 0]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table cash_book {
+  id serial [pk, increment]
+  customer_id integer [ref: > customers.id]
+  date datetime
+  type varchar
+  amount numeric
+  description varchar [null]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}

@@ -1,0 +1,467 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: "CM Catalogue - Customer API"
+  description: "A service for managing customer."
+servers:
+  - url: http://{hostname}/api/v1/customers
+    variables:
+      hostname:
+        default: localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /:
+    get:
+      operationId: getAllCustomersData
+      summary: "Get all customers"
+      tags:
+        - customer
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            example: 25
+        - in: query
+          name: filter
+          schema:
+            type: string
+            example: "Hafiz Mini Market"
+        - in: query
+          name: relationshipFilter
+          schema:
+            type: string
+            enum: ["all", "in_cooperation", "suspended"]
+      responses:
+        "200":
+          description: "Return a list of customer data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customers"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+    post:
+      operationId: createCustomerData
+      summary: "Create new customer"
+      tags:
+        - customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerPost"
+      responses:
+        "201":
+          description: "Create successful, return created customer data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /{customer_id}:
+    get:
+      operationId: getCustomerDataByID
+      summary: "Get a customer data."
+      tags:
+        - customer
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Return a customer data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+    put:
+      operationId: updateCustomerData
+      summary: "Update customer data"
+      tags:
+        - customer
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerPost"
+      responses:
+        "201":
+          description: "Update successful, return customer data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+    delete:
+      operationId: deleteCutomerData
+      summary: "Delete customer data by ID"
+      tags:
+        - customer
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "Delete successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /{customer_id}/cash-book:
+    get:
+      operationId: getCashBookRecords
+      summary: "List out cash book records for selected customer"
+      tags:
+        - cash-book
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: start_at
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: "2022-07-31T16:00:00.000Z"
+        - in: query
+          name: end_at
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: "2022-08-30T16:00:00.000Z"
+      responses:
+        "200":
+          description: "Return a cash book records for selected customer."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CashBookRecords"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+    post:
+      operationId: createCashBookRecord
+      summary: "Create new cash book record for selected customer"
+      tags:
+        - cash-book
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CashBookRecordPost"
+      responses:
+        "204":
+          description: "Create successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /{customer_id}/cash-book/{cash_book_record_id}:
+    delete:
+      operationId: deleteCashBookRecord
+      summary: "Delete a cash book record from the customer"
+      tags:
+        - cash-book
+      parameters:
+        - in: path
+          name: customer_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: cash_book_record_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "Delete successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ForbiddenError:
+      description: Forbidden action
+    Unexpected:
+      description: "Unexpected error."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModelError"
+
+  schemas:
+    Pagination:
+      type: object
+      required: [count, page, total_count]
+      properties:
+        count:
+          description: "Total number of items returned."
+          example: 25
+          type: integer
+        page:
+          description: "Current page."
+          example: 2
+          type: integer
+        total_count:
+          description: "Total number of items available."
+          example: 250
+          type: integer
+
+    Customer:
+      type: object
+      required:
+        [
+          id,
+          code,
+          name,
+          contact,
+          relationship,
+          address,
+          postcode,
+          city,
+          state,
+          total_unbilled_amount,
+          created_at,
+          updated_at,
+        ]
+      properties:
+        id:
+          type: integer
+          example: 1
+        code:
+          type: string
+          example: "AB001"
+          default: ""
+        name:
+          type: string
+          example: "Suria Mini Market"
+        contact:
+          type: string
+          example: "0123456789"
+        relationship:
+          type: string
+          example: "in_cooperation"
+        address:
+          type: string
+          example: "A 29 Jln Jintan Manis Taman Supreme"
+        postcode:
+          type: string
+          example: "56100"
+        city:
+          type: string
+          example: "Kuala Lumpur"
+        state:
+          type: string
+          example: "Kuala Lumpur"
+        total_unbilled_amount:
+          type: number
+          example: 18.90
+        created_at:
+          type: string
+          format: date-time
+          example: "2022-07-21"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2022-07-21"
+
+    Customers:
+      type: object
+      required: [data, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Customer"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+
+    CustomerPost:
+      type: object
+      required: [name, relationship]
+      properties:
+        code:
+          type: string
+          example: "AB001"
+          maxLength: 10
+        name:
+          type: string
+          example: "Suria Mini Market"
+          minLength: 1
+          maxLength: 100
+        contact:
+          type: string
+          example: "0123456789"
+          minLength: 10
+          maxLength: 11
+        relationship:
+          type: string
+          enum: ["in_cooperation", "suspended"]
+        address:
+          type: string
+          example: "A 29 Jln Jintan Manis Taman Supreme"
+          maxLength: 200
+        postcode:
+          type: string
+          example: "56100"
+          minLength: 5
+          maxLength: 5
+        city:
+          type: string
+          example: "Kuala Lumpur"
+          maxLength: 30
+        state:
+          type: string
+          example: "Kuala Lumpur"
+          maxLength: 30
+
+    CashBookRecord:
+      type: object
+      required:
+        [
+          id,
+          customer_id,
+          date,
+          type,
+          amount,
+          description,
+          created_at,
+          updated_at,
+        ]
+      properties:
+        id:
+          type: integer
+          example: 1
+        customer_id:
+          type: integer
+          example: 1
+        date:
+          type: string
+          format: date
+          example: "2021-06-29"
+        type:
+          type: string
+          example: "credit"
+        amount:
+          type: number
+          example: 2000.90
+        description:
+          type: string
+          example: "description for this record"
+        created_at:
+          type: string
+          format: date-time
+          example: "2022-06-25"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2022-06-25"
+
+    CashBookRecords:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CashBookRecord"
+
+    CashBookRecordPost:
+      type: object
+      required: [date, type, amount]
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: "2017-07-21T17:32:28Z"
+        type:
+          type: string
+          enum: ["credit", "debit"]
+        amount:
+          type: number
+          format: float
+          example: 200
+        description:
+          type: string
+          example: "description for this record"
+
+    ModelError:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string

@@ -11,7 +11,12 @@ import {
   signOutFailed,
   signOutSuccess,
 } from "./user.action";
-import { UserData, USER_ACTION_TYPES, USER_LOADING_TYPES } from "./user.types";
+import {
+  UserData,
+  USER_ACTION_TYPES,
+  USER_ERROR_TYPES,
+  USER_LOADING_TYPES,
+} from "./user.types";
 
 export type UserState = {
   readonly currentUser: UserData | null;
@@ -22,7 +27,7 @@ export type UserState = {
 const INITIAL_STATE: UserState = {
   currentUser: null,
   isLoading: initLoadingState(USER_LOADING_TYPES),
-  error: initErrorState(USER_ACTION_TYPES),
+  error: initErrorState(USER_ERROR_TYPES),
 };
 
 export const userReducer = (
@@ -44,14 +49,14 @@ export const userReducer = (
       ...state,
       currentUser: action.payload,
       isLoading: { ...state.isLoading, [USER_LOADING_TYPES.SIGN_IN]: false },
-      error: { ...state.error, [USER_ACTION_TYPES.SIGN_IN_FAILED]: "" },
+      error: { ...state.error, [USER_ERROR_TYPES.SIGN_IN]: "" },
     };
   }
 
   if (signInFailed.match(action)) {
     return {
       ...state,
-      error: { ...state.error, [action.type]: action.payload },
+      error: { ...state.error, [USER_ERROR_TYPES.SIGN_IN]: action.payload },
       isLoading: { ...state.isLoading, [USER_LOADING_TYPES.SIGN_IN]: false },
     };
   }
