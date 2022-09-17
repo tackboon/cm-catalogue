@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/tackboon97/cm-catalogue/internal/common/logs"
-	"github.com/tackboon97/cm-catalogue/internal/common/server"
+	"github.com/tackboon/cm-catalogue/internal/common/logs"
+	"github.com/tackboon/cm-catalogue/internal/common/server"
 )
 
 func main() {

@@ -28,7 +28,7 @@ const SignIn = () => {
   const currentUser = useSelector(selectCurrentUser);
 
   useEffect(() => {
-    if (currentUser) navigate("/", { replace: true });
+    if (currentUser) navigate("/categories", { replace: true });
   }, [currentUser]);
 
   const dispatch = useDispatch();

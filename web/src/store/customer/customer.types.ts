@@ -15,7 +15,7 @@ export enum CUSTOMER_ACTION_TYPES {
   DELETE_CUSTOMER_DATA_SUCCESS = "customer/DELETE_CUSTOMER_DATA_SUCCESS",
   DELETE_CUSTOMER_DATA_START = "customer/DELETE_CUSTOMER_DATA_START",
   DELETE_CUSTOMER_DATA_FAILED = "customer/DELETE_CUSTOMER_DATA_FAILED",
-  SET_CUSTOEMR_TOTAL_UNBILLED_AMOUNT = "customer/SET_CUSTOEMR_TOTAL_UNBILLED_AMOUNT"
+  SET_CUSTOEMR_TOTAL_UNBILLED_AMOUNT = "customer/SET_CUSTOEMR_TOTAL_UNBILLED_AMOUNT",
 }
 
 export enum CUSTOMER_LOADING_TYPES {
@@ -56,4 +56,11 @@ export type CustomerData = {
   total_unbilled_amount: number;
   created_at: Date;
   updated_at: Date;
+};
+
+export type CustomerPagination = {
+  limit: number;
+  count: number;
+  page: number;
+  total_count: number;
 };

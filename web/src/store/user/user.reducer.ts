@@ -20,12 +20,14 @@ import {
 
 export type UserState = {
   readonly currentUser: UserData | null;
+  readonly token: string;
   readonly isLoading: { [key: string]: boolean };
   readonly error: { [key: string]: string };
 };
 
 const INITIAL_STATE: UserState = {
   currentUser: null,
+  token: "",
   isLoading: initLoadingState(USER_LOADING_TYPES),
   error: initErrorState(USER_ERROR_TYPES),
 };
@@ -47,7 +49,8 @@ export const userReducer = (
   if (signInSuccess.match(action)) {
     return {
       ...state,
-      currentUser: action.payload,
+      currentUser: action.payload.user,
+      token: action.payload.token,
       isLoading: { ...state.isLoading, [USER_LOADING_TYPES.SIGN_IN]: false },
       error: { ...state.error, [USER_ERROR_TYPES.SIGN_IN]: "" },
     };
@@ -65,6 +68,7 @@ export const userReducer = (
     return {
       ...state,
       currentUser: null,
+      token: "",
       error: { ...state.error, [USER_ACTION_TYPES.SIGN_OUT_FAILED]: "" },
     };
   }

@@ -1,3 +1,40 @@
+Table categories {
+  id serial [pk, increment]
+  name varchar [unique]
+  file_id varchar [ref: > catalogue_files.id]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table products {
+  id serial [pk, increment]
+  category_id integer [ref: > categories.id]
+  name varchar
+  description varchar [null]
+  price numeric
+  status varchar
+  position numeric [increment]
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table catalogue_files {
+  id varchar [pk]
+  path varchar
+  created_at datetime [default: `now()`]
+  updated_at datetime [default: `now()`]
+}
+
+Table products_catalogue_files {
+  product_id integer [ref: > products.id]
+  file_id varchar [ref: > catalogue_files.id]
+  is_preview integer [default: 0]
+  
+  Indexes {
+    (product_id, file_id) [pk]
+  }
+}
+
 Table customers {
   id serial [pk, increment]
   code varchar [null]

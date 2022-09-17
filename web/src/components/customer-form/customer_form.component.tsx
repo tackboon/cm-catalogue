@@ -24,12 +24,12 @@ import styles from "./customer_form.module.scss";
 export type CustomerFormValues = {
   name: string;
   relationship: CUSTOMER_RELATIONSHIP;
-  code?: string;
-  contact?: string;
-  address?: string;
-  postcode?: string;
-  city?: string;
-  state?: string;
+  code: string;
+  contact: string;
+  address: string;
+  postcode: string;
+  city: string;
+  state: string;
 };
 
 type CustomerFormProps = {

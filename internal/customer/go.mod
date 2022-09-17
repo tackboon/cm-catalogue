@@ -1,8 +1,8 @@
-module github.com/tackboon97/cm-catalogue/internal/customer
+module github.com/tackboon/cm-catalogue/internal/customer
 
-go 1.19
+go 1.18
 
-replace github.com/tackboon97/cm-catalogue/internal/common => ../common/
+replace github.com/tackboon/cm-catalogue/internal/common => ../common/
 
 require (
 	github.com/deepmap/oapi-codegen v1.11.0
@@ -11,7 +11,7 @@ require (
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.17.0
 	github.com/sirupsen/logrus v1.9.0
-	github.com/tackboon97/cm-catalogue/internal/common v0.0.0-00010101000000-000000000000
+	github.com/tackboon/cm-catalogue/internal/common v0.0.0-00010101000000-000000000000
 )
 
 require (

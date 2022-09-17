@@ -1,0 +1,433 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: "CM Catalogue - Catalogue API"
+  description: "A service for managing catalogue."
+servers:
+  - url: http://{hostname}/api/v1/catalogue
+    variables:
+      hostname:
+        default: localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /categories:
+    get:
+      operationId: getAllCategories
+      summary: "Get all categories"
+      tags:
+        - categories
+      responses:
+        "200":
+          description: "Return a list of category."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Categories"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+    post:
+      operationId: createCategory
+      summary: "Create a new category"
+      tags:
+        - categories
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryPost"
+      responses:
+        "201":
+          description: "Create successful, return category data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /categories/{category_id}:
+    get:
+      operationId: getCategoryByID
+      summary: "Get category by id"
+      tags: 
+        - categories
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Return category data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"     
+    put:
+      operationId: updateCategory
+      summary: "Edit the category field"
+      tags:
+        - categories
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryPost"
+      responses:
+        "201":
+          description: "Update successful, return updated data."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+    delete:
+      operationId: deleteCategory
+      summary: "Delete a category"
+      tags:
+        - categories
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "Delete successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /categories/{category_id}/products:
+    get:
+      operationId: getAllCategoryProducts
+      summary: "Get all products for a category"
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: start_position
+          schema:
+            type: number
+            format: double
+            example: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            example: 25
+        - in: query
+          name: filter
+          schema:
+            type: string
+            example: "Super Ring"
+        - in: query
+          name: statusFilter
+          schema:
+            type: string
+            enum: ["all", "in_stock", "out_of_stock"]
+      responses:
+        "200":
+          description: "Return a list of products for the category."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryProducts"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+    post:
+      operationId: createProduct
+      summary: "Create new product"
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPost"
+      responses:
+        "201":
+          description: "Create successful, return created product."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /categories/{category_id}/products/{product_id}:
+    get:
+      operationId: getProductByID
+      summary: "Get product by id"
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Return a product."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+    put:
+      operationId: updateProduct
+      summary: "Update product by ID"
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductPost"
+      responses:
+        "201":
+          description: "Update successful, return a product."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+    delete:
+      operationId: deleteProduct
+      summary: "Delete product by ID"
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "Delete successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    ForbiddenError:
+      description: "Access permission not given"
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    Unexpected:
+      description: "Unexpected error."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModelError"
+
+  schemas:
+    Category:
+      type: object
+      required: [id, name, file_id]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Snack"
+        file_id:
+          type: string
+          example: "2zmFKNvjkn9WkiLN"
+
+    CategoryPost:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: "Snack"
+          minLength: 1
+          maxLength: 50
+        file_id:
+          type: string
+          example: "2zmFKNvjkn9WkiLN"
+
+    Categories:
+      type: object
+      required: [categories]
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+
+    Product:
+      type: object
+      required:
+        [id, name, description, price, status, file_ids, position, preview_id]
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Super Ring x 60g"
+        description:
+          type: string
+          example: "Original flavour 1x10"
+        price:
+          type: number
+          example: 12.50
+        status:
+          type: string
+          example: "in_stock"
+        file_ids:
+          type: array
+          items:
+            type: string
+            example: "2zmFKNvjkn9WkiLN"
+        position:
+          type: number
+          format: double
+          description: "number use for customize sorting"
+          example: 1
+        preview_id:
+          type: string
+          example: "2zmFKNvjkn9WkiLN"
+
+    ProductPost:
+      type: object
+      required: [name, description, price, status]
+      properties:
+        name:
+          type: string
+          example: "Super Ring x 60g"
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          example: "Original flavour 1x10"
+          maxLength: 200
+        price:
+          type: number
+          example: 12.50
+        status:
+          type: string
+          default: "in_stock"
+          enum: ["in_stock", "out_of_stock"]
+        file_ids:
+          type: array
+          items:
+            type: string
+            example: "2zmFKNvjkn9WkiLN"
+        preview_id:
+          type: string
+          example: "2zmFKNvjkn9WkiLN"
+
+    CategoryProducts:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+
+    ModelError:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string

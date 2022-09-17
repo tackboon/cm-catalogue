@@ -1,7 +1,7 @@
 import { all, call, put, takeLatest } from "typed-redux-saga/macro";
 import { CashBookRecordPost } from "../../openapi/customer";
 import { api } from "../../service/openapi/openapi.service";
-import { withEnumGuard } from "../../utils/common/enum_guard";
+import { withEnumGuard } from "../../utils/enum/enum_guard";
 import { setCustomerTotalUnbilledAmount } from "../customer/customer.action";
 import {
   addCashBookRecordFailed,

@@ -40,14 +40,9 @@ const NavigationLayout = () => {
             {currentUser ? (
               <>
                 <Nav className="ms-auto">
-                  <NavDropdown title="Categories">
-                    <NavDropdown.Item as="div">
-                      <Link to="/categories/add-category">
-                        Add Category - 添加分类
-                      </Link>
-                    </NavDropdown.Item>
-                    {/* <NavDropdown.Divider /> */}
-                  </NavDropdown>
+                  <Nav.Link as="span">
+                    <Link to="/categories">Categories</Link>
+                  </Nav.Link>
                 </Nav>
 
                 <Nav>
@@ -101,7 +96,7 @@ const NavigationLayout = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <div className={styles["content-wrapper"]}>
+      <div id="content-wrapper" className={styles["content-wrapper"]}>
         <Outlet />
       </div>
     </>

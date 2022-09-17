@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { Button } from "react-bootstrap";
 
-import { Pagination } from "../../store/common/common.types";
+import { CustomerPagination } from "../../store/customer/customer.types";
 import styles from "./custom_pagination.module.scss";
 
 const enum PAGE_TYPE {
@@ -10,7 +10,7 @@ const enum PAGE_TYPE {
 }
 
 type CustomPaginationProps = {
-  pagination: Pagination;
+  pagination: CustomerPagination;
   handlePagination: (page: number) => void;
 };
 

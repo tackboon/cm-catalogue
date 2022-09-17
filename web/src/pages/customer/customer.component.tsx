@@ -9,7 +9,7 @@ import AddCashBookRecord from "../../components/add-cash-book-record/add_cash_bo
 import CashBookHistory from "../../components/cash-book-history/cash_book_history.component";
 import CustomPagination from "../../components/custom-pagination/custom_pagination.component";
 import SearchBar from "../../components/search-bar/search_bar.component";
-import { withEnumGuard } from "../../utils/common/enum_guard";
+import { withEnumGuard } from "../../utils/enum/enum_guard";
 import {
   searchCustomerStart,
   setRelationshipFilter,
@@ -38,9 +38,7 @@ const Customer = () => {
   const [showEditCustomer, setShowEditCustomer] = useState(false);
   const [showAddCashBookRecord, setShowAddCashBookRecord] = useState(false);
   const [showCashBookHistory, setShowCashBookHistory] = useState(false);
-  const [currentCustomer, setCurrentCustomer] = useState<
-    CustomerData | undefined
-  >();
+  const [currentCustomer, setCurrentCustomer] = useState<CustomerData>();
 
   const openEditCustomer = (customer: CustomerData) => {
     setCurrentCustomer(customer);

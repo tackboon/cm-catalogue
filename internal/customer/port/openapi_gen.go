@@ -46,7 +46,7 @@ type CashBookRecord struct {
 type CashBookRecordPost struct {
 	Amount      float32                `json:"amount"`
 	Date        time.Time              `json:"date"`
-	Description *string                `json:"description,omitempty"`
+	Description string                 `json:"description"`
 	Type        CashBookRecordPostType `json:"type"`
 }
 
@@ -76,14 +76,14 @@ type Customer struct {
 
 // CustomerPost defines model for CustomerPost.
 type CustomerPost struct {
-	Address      *string                  `json:"address,omitempty"`
-	City         *string                  `json:"city,omitempty"`
-	Code         *string                  `json:"code,omitempty"`
-	Contact      *string                  `json:"contact,omitempty"`
+	Address      string                   `json:"address"`
+	City         string                   `json:"city"`
+	Code         string                   `json:"code"`
+	Contact      string                   `json:"contact"`
 	Name         string                   `json:"name"`
-	Postcode     *string                  `json:"postcode,omitempty"`
+	Postcode     string                   `json:"postcode"`
 	Relationship CustomerPostRelationship `json:"relationship"`
-	State        *string                  `json:"state,omitempty"`
+	State        string                   `json:"state"`
 }
 
 // CustomerPostRelationship defines model for CustomerPost.Relationship.

@@ -5,7 +5,7 @@ import {
   createAction,
   withMatcher,
 } from "../../utils/reducer/reducer.util";
-import { Pagination } from "../common/common.types";
+import { CustomerPagination } from "./customer.types";
 import {
   CustomerData,
   CUSTOMER_ACTION_TYPES,
@@ -41,7 +41,7 @@ export type FetchAllCustomerDataSuccess = ActionWithPayload<
   CUSTOMER_ACTION_TYPES.FETCH_ALL_CUSTOMER_DATA_SUCCESS,
   {
     customers: CustomerData[];
-    pagination: Pagination;
+    pagination: CustomerPagination;
   }
 >;
 
@@ -133,7 +133,7 @@ export const fetchAllCustomerDataStart = withMatcher(
 export const fetchAllCustomerDataSuccess = withMatcher(
   (
     customers: CustomerData[],
-    pagination: Pagination
+    pagination: CustomerPagination
   ): FetchAllCustomerDataSuccess =>
     createAction(CUSTOMER_ACTION_TYPES.FETCH_ALL_CUSTOMER_DATA_SUCCESS, {
       customers,

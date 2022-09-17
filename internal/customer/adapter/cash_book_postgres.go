@@ -8,8 +8,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	customError "github.com/tackboon97/cm-catalogue/internal/common/errors"
-	customer "github.com/tackboon97/cm-catalogue/internal/customer/domain"
+	customError "github.com/tackboon/cm-catalogue/internal/common/errors"
+	customer "github.com/tackboon/cm-catalogue/internal/customer/domain"
 )
 
 type CashBookModel struct {
@@ -90,7 +90,68 @@ func (c CashBookPostgresRepository) CreateCashBookRecord(ctx context.Context, ca
 	return nil
 }
 
-func (c CashBookPostgresRepository) GetCashBookRecords(ctx context.Context, customerID int, startAt time.Time, endAt time.Time) ([]customer.CashBookRecord, error) {
+func (c CashBookPostgresRepository) DeleteCashBookRecordByID(ctx context.Context, cashBookID int) error {
+	tx, err := c.db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback(ctx)
+		} else {
+			tx.Commit(ctx)
+		}
+	}()
+
+	var cashbookRecord CashBookModel
+	getStmt := `
+		SELECT id, customer_id, type, amount
+		FROM cash_books WHERE id=$1;
+	`
+	err = tx.QueryRow(ctx, getStmt, cashBookID).Scan(
+		&cashbookRecord.ID,
+		&cashbookRecord.CustomerID,
+		&cashbookRecord.Type,
+		&cashbookRecord.Amount,
+	)
+	if err != nil {
+		return err
+	}
+
+	deleteStmt := `
+		DELETE FROM cash_books WHERE id=$1;
+	`
+	_, err = tx.Exec(ctx, deleteStmt, cashBookID)
+	if err != nil {
+		return err
+	}
+
+	var customerStmt string
+	if string(cashbookRecord.Type) == string(customer.Credit) {
+		customerStmt = `
+		UPDATE customers SET total_unbilled_amount = total_unbilled_amount - $1
+		WHERE id=$2;  
+	`
+	} else {
+		customerStmt = `
+		UPDATE customers SET total_unbilled_amount = total_unbilled_amount + $1
+		WHERE id=$2;  
+	`
+	}
+	_, err = tx.Exec(ctx, customerStmt, cashbookRecord.Amount, cashbookRecord.CustomerID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c CashBookPostgresRepository) GetCashBookRecords(
+	ctx context.Context,
+	customerID int,
+	startAt time.Time,
+	endAt time.Time,
+) ([]customer.CashBookRecord, error) {
 	var appCashbooks []customer.CashBookRecord
 
 	stmt := `
@@ -140,13 +201,16 @@ func cashBookModelToApp(rows pgx.Rows) ([]customer.CashBookRecord, error) {
 		ac.CustomerID = c.CustomerID
 		ac.Date = c.Date
 		ac.Amount = c.Amount
-		ac.Description = c.Description
 		ac.CreatedAt = c.CreatedAt
 		ac.UpdatedAt = c.UpdatedAt
 
+		if c.Description != nil {
+			ac.Description = *c.Description
+		}
+
 		if c.Type == string(customer.Debit) {
 			ac.Type = customer.Debit
-		} else {
+		} else if c.Type == string(customer.Credit) {
 			ac.Type = customer.Credit
 		}
 
@@ -154,60 +218,4 @@ func cashBookModelToApp(rows pgx.Rows) ([]customer.CashBookRecord, error) {
 	}
 
 	return appCashbook, nil
-}
-
-func (c CashBookPostgresRepository) DeleteCashBookRecord(ctx context.Context, customerID int, cashBookID int) error {
-	tx, err := c.db.BeginTx(ctx, pgx.TxOptions{})
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err != nil {
-			tx.Rollback(ctx)
-		} else {
-			tx.Commit(ctx)
-		}
-	}()
-
-	var cashbookRecord CashBookModel
-	getStmt := `
-		SELECT id, customer_id, type, amount
-		FROM cash_books WHERE id=$1 AND customer_id=$2;
-	`
-	err = tx.QueryRow(ctx, getStmt, cashBookID, customerID).Scan(
-		&cashbookRecord.ID,
-		&cashbookRecord.CustomerID,
-		&cashbookRecord.Type,
-		&cashbookRecord.Amount,
-	)
-	if err != nil {
-		return err
-	}
-
-	deleteStmt := `
-		DELETE FROM cash_books WHERE id=$1 AND customer_id=$2;
-	`
-	_, err = tx.Exec(ctx, deleteStmt, cashBookID, customerID)
-	if err != nil {
-		return err
-	}
-
-	var customerStmt string
-	if string(cashbookRecord.Type) == string(customer.Credit) {
-		customerStmt = `
-		UPDATE customers SET total_unbilled_amount = total_unbilled_amount - $1
-		WHERE id=$2;  
-	`
-	} else {
-		customerStmt = `
-		UPDATE customers SET total_unbilled_amount = total_unbilled_amount + $1
-		WHERE id=$2;  
-	`
-	}
-	_, err = tx.Exec(ctx, customerStmt, cashbookRecord.Amount, cashbookRecord.CustomerID)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

@@ -348,7 +348,7 @@ components:
 
     CustomerPost:
       type: object
-      required: [name, relationship]
+      required: [code, name, contact, relationship, address, postcode, city, state]
       properties:
         code:
           type: string
@@ -438,7 +438,7 @@ components:
 
     CashBookRecordPost:
       type: object
-      required: [date, type, amount]
+      required: [date, type, amount, description]
       properties:
         date:
           type: string

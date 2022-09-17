@@ -1,6 +1,6 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Button, Modal, Table } from "react-bootstrap";
-import DatePicker from "react-datepicker";
+import DatePicker, { ReactDatePicker } from "react-datepicker";
 import { BsCalendarFill, BsFillTrashFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -27,6 +27,7 @@ const CashBookHistory: FC<CashBookHistoryProps> = ({
   const dispatch = useDispatch();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const cashBookRecords = useSelector(selectCashBookRecords);
+  const datePickerRef = useRef(null);
 
   const handleClose = () => {
     onClose();
@@ -73,6 +74,7 @@ const CashBookHistory: FC<CashBookHistoryProps> = ({
         <label>Select Month:</label>
         <div className={styles["month-picker-container"]}>
           <DatePicker
+            ref={datePickerRef}
             className={styles["month-picker"]}
             dateFormat="MMM yyyy"
             showPopperArrow={false}
@@ -80,7 +82,15 @@ const CashBookHistory: FC<CashBookHistoryProps> = ({
             onChange={handleDateChange}
             showMonthYearPicker
           />
-          <BsCalendarFill className={styles["month-picker-icon"]} />
+          <BsCalendarFill
+            className={styles["month-picker-icon"]}
+            onClick={() => {
+              if (datePickerRef.current) {
+                const el = datePickerRef.current as ReactDatePicker;
+                el.setFocus();
+              }
+            }}
+          />
         </div>
 
         <Table hover className="mt-5">

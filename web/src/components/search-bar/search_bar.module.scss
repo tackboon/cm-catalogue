@@ -1,0 +1,24 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+.search-input {
+  height: 3rem;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1.75rem;
+  border: 1px solid $gray-500;
+  border-radius: 0.5rem;
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  position: absolute;
+  top: 50%;
+  right: 1.3rem;
+  transform: translateY(-50%);
+  cursor: pointer;
+
+  &:hover {
+    color: $gray-600;
+  }
+}

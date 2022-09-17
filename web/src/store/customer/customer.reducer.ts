@@ -5,7 +5,7 @@ import {
   initErrorState,
   initLoadingState,
 } from "../../utils/reducer/reducer.util";
-import { Pagination } from "../common/common.types";
+import { CustomerPagination } from "./customer.types";
 import {
   createCustomerDataFailed,
   createCustomerDataSuccess,
@@ -27,11 +27,11 @@ import {
   CUSTOMER_LOADING_TYPES,
   SELECT_CUSTOMER_RELATIONSHIP,
 } from "./customer.types";
-import { withEnumGuard } from "../../utils/common/enum_guard";
+import { withEnumGuard } from "../../utils/enum/enum_guard";
 
 export type CustomerState = {
   readonly customers: CustomerData[];
-  readonly pagination: Pagination;
+  readonly pagination: CustomerPagination;
   readonly filter: string;
   readonly relationshipFilter: SELECT_CUSTOMER_RELATIONSHIP;
   readonly isLoading: { [key: string]: boolean };

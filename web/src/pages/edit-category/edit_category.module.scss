@@ -1,0 +1,9 @@
+.edit-category-header {
+  padding-top: 3rem;
+  padding-bottom: 1.5rem;
+
+  :global(h1) {
+    font-weight: 100;
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,20 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins/breakpoints";
+
+.upload-wrapper {
+  .images-preview {
+    height: 8rem;
+    border: 1px solid $gray-700;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+  }
+}
+
+.product-form-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
