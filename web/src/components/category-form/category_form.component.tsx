@@ -3,6 +3,7 @@ import { Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
 import {
   deleteCategoryStart,
   resetCategoryError,
@@ -13,9 +14,9 @@ import {
   CATEGORY_ERROR_TYPES,
   CATEGORY_LOADING_TYPES,
 } from "../../store/category/category.types";
-
 import { retryUpload } from "../../store/tus-upload/tus_upload.action";
 import { selectUploads } from "../../store/tus-upload/tus_upload.selector";
+
 import ImagePreview from "../image-preview/image_preview.component";
 import ImageUploader from "../image-uploader/image_uploader.component";
 import LoadingButton from "../loading-button/loading_button.component";
@@ -33,6 +34,19 @@ type CategoryFormProps = {
   initData?: CategoryData;
 };
 
+const defaultValues = {
+  name: "",
+  zhName: "",
+};
+
+const imageInfo = {
+  previewURL: "/images/no-photo-available.png",
+  progress: 0,
+  isUploading: false,
+  isError: false,
+  onRetry: () => {},
+};
+
 const CategoryForm: FC<CategoryFormProps> = ({
   onSubmit,
   error,
@@ -42,33 +56,32 @@ const CategoryForm: FC<CategoryFormProps> = ({
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const uploads = useSelector(selectUploads);
-  const [startSubmit, setStartSubmit] = useState(false);
-
-  const defaultValues = {
-    name: "",
-    zhName: "",
-  };
-
-  const imageInfo = {
-    previewURL: "/images/no-photo-available.png",
-    progress: 0,
-    isUploading: false,
-    isError: false,
-    onRetry: () => {},
-  };
 
   if (initData) {
+    // process initial category name
     const items = initData.name.split(" - ");
     defaultValues.name = items[0];
     if (items.length > 1) {
       defaultValues.zhName = items[1];
     }
 
+    // retrieve image from file server if file_id exist
     if (initData.file_id !== "") {
       imageInfo.previewURL = `${process.env.REACT_APP_UPLOADER_ENDPOINT}/${initData.file_id}`;
     }
   }
 
+  // initialize react-hook-form
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    reset,
+  } = useForm<CategoryFormValues>({
+    defaultValues,
+  });
+
+  // update image info if file upload happened
   const uploadKeys = Object.keys(uploads);
   if (uploadKeys.length > 0) {
     imageInfo.previewURL = URL.createObjectURL(uploads[uploadKeys[0]].file);
@@ -80,21 +93,12 @@ const CategoryForm: FC<CategoryFormProps> = ({
     };
   }
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-    reset,
-  } = useForm<CategoryFormValues>({
-    defaultValues,
-  });
-
+  // handle form submit
+  const [startSubmit, setStartSubmit] = useState(false);
   const onFormSubmit = (data: CategoryFormValues) => {
     setStartSubmit(true);
-
     const name =
       data.zhName === "" ? data.name : data.name + " - " + data.zhName;
-
     let fileID = initData?.file_id || "";
     const uploadKeys = Object.keys(uploads);
     if (uploadKeys.length > 0) {
@@ -103,9 +107,9 @@ const CategoryForm: FC<CategoryFormProps> = ({
     onSubmit(name, fileID);
   };
 
+  // handle delete category
   const { [CATEGORY_LOADING_TYPES.DELETE_CATEGORY]: isDeleteLoading } =
     useSelector(selectCategorysLoading);
-
   const [startDelete, setStartDelete] = useState(false);
   const handleDelete = () => {
     setStartDelete(true);
@@ -113,6 +117,7 @@ const CategoryForm: FC<CategoryFormProps> = ({
     dispatch(deleteCategoryStart(id));
   };
 
+  // navigate to category list page after submit successful
   useEffect(() => {
     if (
       (startSubmit && !isSubmitLoading && error === "") ||
@@ -120,15 +125,23 @@ const CategoryForm: FC<CategoryFormProps> = ({
     ) {
       navigate("/categories");
     }
-  }, [startSubmit, isSubmitLoading, error, startDelete, isDeleteLoading]);
+  }, [
+    startSubmit,
+    isSubmitLoading,
+    error,
+    startDelete,
+    isDeleteLoading,
+    navigate,
+  ]);
 
+  // clean up form on page unmount
   useEffect(() => {
     return () => {
       reset();
       dispatch(resetCategoryError(CATEGORY_ERROR_TYPES.ADD_CATEGORY));
       dispatch(resetCategoryError(CATEGORY_ERROR_TYPES.UPDATE_CATEGORY));
     };
-  }, []);
+  }, [dispatch, reset]);
 
   return (
     <Form onSubmit={handleSubmit(onFormSubmit)}>

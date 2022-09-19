@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { BsArrowsMove } from "react-icons/bs";
 
 import {
   ProductData,
@@ -8,10 +9,12 @@ import styles from "./product_item.module.scss";
 
 type ProductItemProps = {
   product: ProductData;
+  isDraggable: boolean;
 };
 
 const ProductItem: FC<ProductItemProps> = ({
   product,
+  isDraggable,
   ...props
 }) => {
   const fileID =
@@ -27,6 +30,9 @@ const ProductItem: FC<ProductItemProps> = ({
 
   return (
     <div {...props} className={styles["product-item-container"]}>
+      <div className={`${styles["move"]} ${isDraggable ? "" : "d-none"}`}>
+        <BsArrowsMove />
+      </div>
       <img src={imagePath} alt={product.preview_id} draggable={false} />
       <div className={styles["product-item-info"]}>
         <p className={styles["product-item-info__name"]}>{product.name}</p>

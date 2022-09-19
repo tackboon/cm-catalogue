@@ -14,7 +14,8 @@ import {
   fetchAllCustomerDataFailed,
   fetchAllCustomerDataSuccess,
   resetCustomerError,
-  searchCustomerStart,
+  setCustomerFilter,
+  setCustomerPagination,
   setCustomerTotalUnbilledAmount,
   setIsCustomerLoading,
   setRelationshipFilter,
@@ -43,7 +44,7 @@ const cookieRelationshipFilter = Cookies.get("relationship_filter");
 const INITIAL_STATE: CustomerState = {
   customers: [],
   pagination: {
-    limit: 20,
+    limit: 3,
     count: 0,
     page: 1,
     total_count: 0,
@@ -72,13 +73,10 @@ export const customerReducer = (
     };
   }
 
-  if (resetCustomerError.match(action)) {
+  if (setCustomerFilter.match(action)) {
     return {
       ...state,
-      error: {
-        ...state.error,
-        [action.payload]: "",
-      },
+      filter: action.payload,
     };
   }
 
@@ -90,14 +88,23 @@ export const customerReducer = (
     };
   }
 
-  if (searchCustomerStart.match(action)) {
+  if (setCustomerPagination.match(action)) {
     return {
       ...state,
       pagination: {
         ...state.pagination,
-        page: action.payload.page,
+        page: action.payload,
       },
-      filter: action.payload.filter,
+    };
+  }
+
+  if (resetCustomerError.match(action)) {
+    return {
+      ...state,
+      error: {
+        ...state.error,
+        [action.payload]: "",
+      },
     };
   }
 

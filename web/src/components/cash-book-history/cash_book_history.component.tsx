@@ -61,7 +61,7 @@ const CashBookHistory: FC<CashBookHistoryProps> = ({
       );
       dispatch(fetchCashBookRecordStart(customer.id, firstDay, lastDay));
     }
-  }, [show, customer, selectedDate]);
+  }, [show, customer, selectedDate, dispatch]);
 
   return (
     <Modal backdrop="static" show={show} size="xl">

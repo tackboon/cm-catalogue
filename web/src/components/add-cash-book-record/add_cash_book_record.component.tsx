@@ -62,7 +62,7 @@ const AddCashBookRecord: FC<AddCashBookRecordProp> = ({
   const handleClose = useCallback(() => {
     reset();
     onClose();
-  }, []);
+  }, [onClose, reset]);
 
   const handleDateChange = (date: Date) => {
     setValue("date", date);
@@ -84,11 +84,12 @@ const AddCashBookRecord: FC<AddCashBookRecordProp> = ({
     }
   };
 
+  // auto close dialog after submit successful
   useEffect(() => {
     if (startSubmit && !isLoading && cashBookError === "") {
       handleClose();
     }
-  }, [startSubmit, isLoading, cashBookError]);
+  }, [startSubmit, isLoading, cashBookError, handleClose]);
 
   return (
     <Modal backdrop="static" show={show} onHide={handleClose}>

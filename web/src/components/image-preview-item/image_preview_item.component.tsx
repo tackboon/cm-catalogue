@@ -31,8 +31,8 @@ const ImagePreviewItem: FC<ImagePreviewItemProps> = ({
   handleSelectPreview,
   handleRemoveUpload,
 }) => {
+  // zoom image on image clicked
   const [zoomImageURL, setZoomImageURL] = useState("");
-
   const handleZoomIn = (e: MouseEvent<HTMLImageElement>) => {
     const el = e.target as HTMLImageElement;
     if (el) {

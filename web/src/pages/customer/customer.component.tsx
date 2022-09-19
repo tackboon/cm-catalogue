@@ -11,7 +11,9 @@ import CustomPagination from "../../components/custom-pagination/custom_paginati
 import SearchBar from "../../components/search-bar/search_bar.component";
 import { withEnumGuard } from "../../utils/enum/enum_guard";
 import {
-  searchCustomerStart,
+  fetchAllCustomerDataStart,
+  setCustomerFilter,
+  setCustomerPagination,
   setRelationshipFilter,
 } from "../../store/customer/customer.action";
 import {
@@ -30,9 +32,6 @@ import styles from "./customer.module.scss";
 const Customer = () => {
   const dispatch = useDispatch();
   const customerList = useSelector(selectCustomers);
-  const customerPagination = useSelector(selectCustomerPagination);
-  const customerFilter = useSelector(selectCustomerFilter);
-  const relationshipFilter = useSelector(selectCustomerRelationshipFilter);
 
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [showEditCustomer, setShowEditCustomer] = useState(false);
@@ -40,21 +39,8 @@ const Customer = () => {
   const [showCashBookHistory, setShowCashBookHistory] = useState(false);
   const [currentCustomer, setCurrentCustomer] = useState<CustomerData>();
 
-  const openEditCustomer = (customer: CustomerData) => {
-    setCurrentCustomer(customer);
-    setShowEditCustomer(true);
-  };
-
-  const openAddCashBookRecord = (customer: CustomerData) => {
-    setCurrentCustomer(customer);
-    setShowAddCashBookRecord(true);
-  };
-
-  const openCashBookHistory = (customer: CustomerData) => {
-    setCurrentCustomer(customer);
-    setShowCashBookHistory(true);
-  };
-
+  // handle relationship filter
+  const relationshipFilter = useSelector(selectCustomerRelationshipFilter);
   const handleSelectRelationshipFilter = (
     e: ChangeEvent<HTMLSelectElement>
   ) => {
@@ -66,14 +52,25 @@ const Customer = () => {
     dispatch(setRelationshipFilter(value));
   };
 
+  // handle pagination
+  const customerPagination = useSelector(selectCustomerPagination);
   const offset = (customerPagination.page - 1) * customerPagination.limit;
   const handlePagination = (page: number) => {
-    dispatch(searchCustomerStart(page, customerFilter));
+    dispatch(setCustomerPagination(page));
   };
 
+  // handle customer filter
+  const customerFilter = useSelector(selectCustomerFilter);
   useEffect(() => {
-    dispatch(searchCustomerStart(customerPagination.page, customerFilter));
-  }, []);
+    dispatch(fetchAllCustomerDataStart());
+  }, [customerFilter, customerPagination.page, dispatch]);
+
+  // clean up customer filter on unmount
+  useEffect(() => {
+    return () => {
+      dispatch(setCustomerFilter(""));
+    };
+  }, [dispatch]);
 
   return (
     <>
@@ -87,7 +84,8 @@ const Customer = () => {
               className={styles["search-bar"]}
               placeholder="Search customer here..."
               onSearch={(criteria) => {
-                dispatch(searchCustomerStart(1, criteria));
+                dispatch(setCustomerFilter(criteria));
+                handlePagination(1)
               }}
             />
             <Form.Select
@@ -118,9 +116,18 @@ const Customer = () => {
                   key={customer.id}
                   index={offset + index + 1}
                   customer={customer}
-                  openEditCustomer={openEditCustomer}
-                  openAddCashBookRecord={openAddCashBookRecord}
-                  openCashBookHistory={openCashBookHistory}
+                  openEditCustomer={(customer: CustomerData) => {
+                    setCurrentCustomer(customer);
+                    setShowEditCustomer(true);
+                  }}
+                  openAddCashBookRecord={(customer: CustomerData) => {
+                    setCurrentCustomer(customer);
+                    setShowAddCashBookRecord(true);
+                  }}
+                  openCashBookHistory={(customer: CustomerData) => {
+                    setCurrentCustomer(customer);
+                    setShowCashBookHistory(true);
+                  }}
                 />
               ))
             )}

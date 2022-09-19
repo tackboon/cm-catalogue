@@ -11,11 +11,15 @@ type CategoryItemProps = {
 
 const CategoryItem: FC<CategoryItemProps> = ({ category }) => {
   const navigate = useNavigate();
+
+  // set image path
   const imagePath =
     category.file_id === ""
       ? "/images/no-photo-available.png"
       : process.env.REACT_APP_UPLOADER_ENDPOINT + `/${category.file_id}`;
 
+  // navigate to edit category page if edit button clicked
+  // else navigate to category product page
   const handleNavigate = (
     event: MouseEvent<HTMLElement>,
     categoryID: number

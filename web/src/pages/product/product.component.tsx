@@ -1,126 +1,72 @@
-import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button, Card, Container, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { GridContainer, BlockWrapper } from "@tackboon/react-grid-rearrange";
+
+import {
+  resetProductFilter,
+  searchProductStart,
+} from "../../store/product/product.action";
+import { selectProducts } from "../../store/product/product.selector";
+import {
+  ProductData,
+  SELECT_PRODUCT_STATUS,
+} from "../../store/product/product.types";
 
 import AddProduct from "../../components/add-product/add_product.component";
 import EditProduct from "../../components/edit-product/edit_product.component";
 import ProductItem from "../../components/product-item/product_item.component";
 import SearchBar from "../../components/search-bar/search_bar.component";
-import { selectCategories } from "../../store/category/category.selector";
-import {
-  fetchAllProductStart,
-  searchProductStart,
-  setCategoryID,
-  setStatusFilter,
-} from "../../store/product/product.action";
-import {
-  selectProductIsLoading,
-  selectProductPagination,
-  selectProducts,
-  selectProductStatusFilter,
-} from "../../store/product/product.selector";
-import {
-  ProductData,
-  PRODUCT_LOADING_TYPE,
-  SELECT_PRODUCT_STATUS,
-} from "../../store/product/product.types";
-import { withEnumGuard } from "../../utils/enum/enum_guard";
-import {
-  GridContainer,
-  BlockWrapper,
-  GridCallbackProps,
-} from "@tackboon/react-grid-rearrange";
+
+import useCategoryFilterHandler from "./hooks/useCategoryFilterHandler";
+import useProductStatusFilterHandler from "./hooks/useProductStatusFilterHandler";
+import useProductPagination from "./hooks/useProductPagination";
+import useProductDragHandler from "./hooks/useProductDragHandler";
 import styles from "./product.module.scss";
 
 const Product = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const params = useParams();
+
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showEditProduct, setShowEditProduct] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<ProductData>();
   const products = useSelector(selectProducts);
 
-  const params = useParams();
-  let categoryID = 0;
-  if (params.id) {
-    categoryID = parseInt(params.id);
-  }
+  // handle pagination on scroll
+  useProductPagination();
 
-  const categories = useSelector(selectCategories);
-  const currentCategory = categories.filter((c) => c.id === categoryID)[0];
+  // handle category filter
+  const { selectedCategory, categories, handleCategoryChange } =
+    useCategoryFilterHandler(params.id ? +params.id : 0);
 
-  const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    if (event.target.value) {
-      navigate(`/categories/${event.target.value}/products`);
-    }
-  };
+  // handle product status filter
+  const { selectedProductStatus, handleProductStatusChange } =
+    useProductStatusFilterHandler();
 
-  const statusFilter = useSelector(selectProductStatusFilter);
-  const handleStatusChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    const value = withEnumGuard(SELECT_PRODUCT_STATUS).check(e.target.value)
-      ? e.target.value
-      : SELECT_PRODUCT_STATUS.ALL;
-    dispatch(setStatusFilter(value));
-  };
-
-  useEffect(() => {
-    dispatch(setCategoryID(currentCategory.id));
-  }, [currentCategory]);
-
-  const { [PRODUCT_LOADING_TYPE.FETCH_ALL_PRODUCT]: isFetching } = useSelector(
-    selectProductIsLoading
-  );
-  const pagination = useSelector(selectProductPagination);
-  useEffect(() => {
-    const wrapper = document.getElementById(
-      "content-wrapper"
-    ) as HTMLDivElement;
-    if (wrapper) {
-      const handlePagination = () => {
-        const contentHeight = wrapper.scrollHeight - wrapper.offsetHeight;
-        if (
-          !pagination.isLastPage &&
-          !isFetching &&
-          (contentHeight - wrapper.scrollTop) / contentHeight < 0.2
-        ) {
-          dispatch(fetchAllProductStart());
-        }
-      };
-
-      wrapper.addEventListener("scroll", handlePagination);
-      return () => {
-        wrapper.removeEventListener("scroll", handlePagination);
-      };
-    }
-  }, [isFetching]);
-
+  // handle product click
   const handleProductClick = useCallback((product: ProductData) => {
     setCurrentProduct(product);
     setShowEditProduct(true);
   }, []);
 
-  const gridCallback = useCallback(({
-    isClick,
-    order,
-    isDragging,
-    lastMovingIndex,
-  }: GridCallbackProps) => {
-    if (isClick && !isDragging) {
-      handleProductClick(products[lastMovingIndex]);
-    }
+  // handle drag and reorder product
+  const { disableDrag, gridCallback } =
+    useProductDragHandler(handleProductClick);
 
-    if (lastMovingIndex !== -1 && !isDragging) {
-      const newOrder = order.map((o) => products[o]);
-      // console.log(newOrder);
-    }
-  }, [handleProductClick, products]);
+  // clean up search bar on exit
+  useEffect(() => {
+    return () => {
+      dispatch(resetProductFilter());
+    };
+  }, [dispatch]);
 
   return (
     <>
       <Container>
         <div className={styles["product-header"]}>
-          <h1>{currentCategory.name}</h1>
+          <h1>{selectedCategory.name}</h1>
         </div>
 
         <div className={styles["product-body"]}>
@@ -135,7 +81,7 @@ const Product = () => {
 
             <Form.Select
               className={styles["select-category"]}
-              defaultValue={currentCategory.id}
+              defaultValue={selectedCategory.id}
               onChange={handleCategoryChange}
             >
               {categories.map((c) => (
@@ -147,8 +93,8 @@ const Product = () => {
 
             <Form.Select
               className={styles["select-status"]}
-              defaultValue={statusFilter}
-              onChange={handleStatusChange}
+              defaultValue={selectedProductStatus}
+              onChange={handleProductStatusChange}
             >
               <option value={SELECT_PRODUCT_STATUS.ALL}>All</option>
               <option value={SELECT_PRODUCT_STATUS.IN_STOCK}>In Stock</option>
@@ -181,12 +127,17 @@ const Product = () => {
                 rowGap={50}
                 colGap={50}
                 totalItem={products.length}
+                disableDrag={disableDrag}
                 cb={gridCallback}
+                scrollElementID="content-wrapper"
               >
                 {(styles) =>
                   styles.map((style, i) => (
                     <BlockWrapper animationStyle={style} key={i} index={i}>
-                      <ProductItem product={products[i]} />
+                      <ProductItem
+                        product={products[i]}
+                        isDraggable={!disableDrag}
+                      />
                     </BlockWrapper>
                   ))
                 }
@@ -199,13 +150,13 @@ const Product = () => {
       <AddProduct
         show={showAddProduct}
         onClose={() => setShowAddProduct(false)}
-        categoryID={currentCategory.id}
+        categoryID={selectedCategory.id}
       />
       <EditProduct
         show={showEditProduct}
         onClose={() => setShowEditProduct(false)}
         product={currentProduct}
-        categoryID={currentCategory.id}
+        categoryID={selectedCategory.id}
       />
     </>
   );

@@ -293,6 +293,42 @@ paths:
         default:
           $ref: "#/components/responses/Unexpected"
 
+  /categories/{category_id}/products/{product_id}/set-position:
+    put:
+      operationId: setProductPosition
+      summary: "Set product position"
+      tags:
+        - products
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                position:
+                  type: integer
+                  example: 2.5
+      responses:
+        "204":
+          description: "Position set successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+  
 components:
   securitySchemes:
     bearerAuth:

@@ -216,6 +216,19 @@ export const ProductPostStatusEnum = {
 
 export type ProductPostStatusEnum = typeof ProductPostStatusEnum[keyof typeof ProductPostStatusEnum];
 
+/**
+ * 
+ * @export
+ * @interface SetProductPositionRequest
+ */
+export interface SetProductPositionRequest {
+    /**
+     * 
+     * @type {number}
+     * @memberof SetProductPositionRequest
+     */
+    'position'?: number;
+}
 
 /**
  * CategoriesApi - axios parameter creator
@@ -808,6 +821,54 @@ export const ProductsApiAxiosParamCreator = function (configuration?: Configurat
         },
         /**
          * 
+         * @summary Set product position
+         * @param {number} categoryId 
+         * @param {number} productId 
+         * @param {SetProductPositionRequest} setProductPositionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setProductPosition: async (categoryId: number, productId: number, setProductPositionRequest: SetProductPositionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'categoryId' is not null or undefined
+            assertParamExists('setProductPosition', 'categoryId', categoryId)
+            // verify required parameter 'productId' is not null or undefined
+            assertParamExists('setProductPosition', 'productId', productId)
+            // verify required parameter 'setProductPositionRequest' is not null or undefined
+            assertParamExists('setProductPosition', 'setProductPositionRequest', setProductPositionRequest)
+            const localVarPath = `/categories/{category_id}/products/{product_id}/set-position`
+                .replace(`{${"category_id"}}`, encodeURIComponent(String(categoryId)))
+                .replace(`{${"product_id"}}`, encodeURIComponent(String(productId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(setProductPositionRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Update product by ID
          * @param {number} categoryId 
          * @param {number} productId 
@@ -917,6 +978,19 @@ export const ProductsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Set product position
+         * @param {number} categoryId 
+         * @param {number} productId 
+         * @param {SetProductPositionRequest} setProductPositionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async setProductPosition(categoryId: number, productId: number, setProductPositionRequest: SetProductPositionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.setProductPosition(categoryId, productId, setProductPositionRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Update product by ID
          * @param {number} categoryId 
          * @param {number} productId 
@@ -984,6 +1058,18 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
          */
         getProductByID(categoryId: number, productId: number, options?: any): AxiosPromise<Product> {
             return localVarFp.getProductByID(categoryId, productId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Set product position
+         * @param {number} categoryId 
+         * @param {number} productId 
+         * @param {SetProductPositionRequest} setProductPositionRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        setProductPosition(categoryId: number, productId: number, setProductPositionRequest: SetProductPositionRequest, options?: any): AxiosPromise<void> {
+            return localVarFp.setProductPosition(categoryId, productId, setProductPositionRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1060,6 +1146,20 @@ export class ProductsApi extends BaseAPI {
      */
     public getProductByID(categoryId: number, productId: number, options?: AxiosRequestConfig) {
         return ProductsApiFp(this.configuration).getProductByID(categoryId, productId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Set product position
+     * @param {number} categoryId 
+     * @param {number} productId 
+     * @param {SetProductPositionRequest} setProductPositionRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ProductsApi
+     */
+    public setProductPosition(categoryId: number, productId: number, setProductPositionRequest: SetProductPositionRequest, options?: AxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).setProductPosition(categoryId, productId, setProductPositionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

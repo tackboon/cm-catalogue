@@ -104,6 +104,11 @@ type CreateProductJSONBody = ProductPost
 // UpdateProductJSONBody defines parameters for UpdateProduct.
 type UpdateProductJSONBody = ProductPost
 
+// SetProductPositionJSONBody defines parameters for SetProductPosition.
+type SetProductPositionJSONBody struct {
+	Position *int `json:"position,omitempty"`
+}
+
 // CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
 type CreateCategoryJSONRequestBody = CreateCategoryJSONBody
 
@@ -115,6 +120,9 @@ type CreateProductJSONRequestBody = CreateProductJSONBody
 
 // UpdateProductJSONRequestBody defines body for UpdateProduct for application/json ContentType.
 type UpdateProductJSONRequestBody = UpdateProductJSONBody
+
+// SetProductPositionJSONRequestBody defines body for SetProductPosition for application/json ContentType.
+type SetProductPositionJSONRequestBody SetProductPositionJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -148,6 +156,9 @@ type ServerInterface interface {
 	// Update product by ID
 	// (PUT /categories/{category_id}/products/{product_id})
 	UpdateProduct(w http.ResponseWriter, r *http.Request, categoryId int, productId int)
+	// Set product position
+	// (PUT /categories/{category_id}/products/{product_id}/set-position)
+	SetProductPosition(w http.ResponseWriter, r *http.Request, categoryId int, productId int)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -491,6 +502,43 @@ func (siw *ServerInterfaceWrapper) UpdateProduct(w http.ResponseWriter, r *http.
 	handler(w, r.WithContext(ctx))
 }
 
+// SetProductPosition operation middleware
+func (siw *ServerInterfaceWrapper) SetProductPosition(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "category_id" -------------
+	var categoryId int
+
+	err = runtime.BindStyledParameter("simple", false, "category_id", chi.URLParam(r, "category_id"), &categoryId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "category_id", Err: err})
+		return
+	}
+
+	// ------------- Path parameter "product_id" -------------
+	var productId int
+
+	err = runtime.BindStyledParameter("simple", false, "product_id", chi.URLParam(r, "product_id"), &productId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "product_id", Err: err})
+		return
+	}
+
+	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
+
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SetProductPosition(w, r, categoryId, productId)
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler(w, r.WithContext(ctx))
+}
+
 type UnescapedCookieParamError struct {
 	ParamName string
 	Err       error
@@ -633,6 +681,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/categories/{category_id}/products/{product_id}", wrapper.UpdateProduct)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/categories/{category_id}/products/{product_id}/set-position", wrapper.SetProductPosition)
 	})
 
 	return r

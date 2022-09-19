@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,18 +48,23 @@ const ProductForm: FC<ProductFormProps> = ({
   submitIsLoading,
 }) => {
   const dispatch = useDispatch();
-  const [startSubmit, setStartSubmit] = useState(false);
-  const [startDelete, setStartDelete] = useState(false);
+  const categories = useSelector(selectCategories);
+
+  // handle old product file
+  const uploads = useSelector(selectUploads);
   const [selectedPreview, setSelectedPreview] = useState(
     initData ? initData.preview_id : ""
   );
-  const uploads = useSelector(selectUploads);
-  const categories = useSelector(selectCategories);
-
   const [uploadedFileIDs, setUploadedFileIDs] = useState<string[]>(
     initData && initData.file_ids ? [...initData.file_ids] : []
   );
 
+  // handle remove old product file
+  const removeUploadedFiles = (fileID: string) => {
+    setUploadedFileIDs(uploadedFileIDs.filter((id) => id !== fileID));
+  };
+
+  // initialize react-hook-form
   const {
     handleSubmit,
     register,
@@ -75,6 +80,8 @@ const ProductForm: FC<ProductFormProps> = ({
     },
   });
 
+  // handle form submit
+  const [startSubmit, setStartSubmit] = useState(false);
   const onFormSubmit = (data: ProductFormValues) => {
     const fileIDs: string[] = [];
     Object.keys(uploads).forEach((key) => {
@@ -82,30 +89,20 @@ const ProductForm: FC<ProductFormProps> = ({
         fileIDs.push(uploads[key].id);
       }
     });
-
     setStartSubmit(true);
     onSubmit(data.categoryID, {
       ...data,
       price: data.price * 1,
       preview_id: selectedPreview,
+      // combine new upload file with old product file
       file_ids: [...fileIDs, ...uploadedFileIDs],
     });
   };
 
-  const removeUploadedFiles = (fileID: string) => {
-    setUploadedFileIDs(uploadedFileIDs.filter((id) => id !== fileID));
-  };
-
-  const handleClose = () => {
-    reset();
-    dispatch(resetProductError(PRODUCT_ERROR_TYPE.ADD_PRODUCT));
-    dispatch(resetProductError(PRODUCT_ERROR_TYPE.UPDATE_PRODUCT));
-    onClose();
-  };
-
+  // handle delete product
+  const [startDelete, setStartDelete] = useState(false);
   const { [PRODUCT_LOADING_TYPE.DELETE_PRODUCT]: isDeleteLoading } =
     useSelector(selectProductIsLoading);
-
   const handleDelete = () => {
     if (initData) {
       setStartDelete(true);
@@ -113,6 +110,15 @@ const ProductForm: FC<ProductFormProps> = ({
     }
   };
 
+  // clean up form and close dialog
+  const handleClose = useCallback(() => {
+    reset();
+    dispatch(resetProductError(PRODUCT_ERROR_TYPE.ADD_PRODUCT));
+    dispatch(resetProductError(PRODUCT_ERROR_TYPE.UPDATE_PRODUCT));
+    onClose();
+  }, [reset, dispatch, onClose]);
+
+  // trigger close if submit success
   useEffect(() => {
     if (
       (startSubmit && submitError === "" && !submitIsLoading) ||
@@ -120,7 +126,14 @@ const ProductForm: FC<ProductFormProps> = ({
     ) {
       handleClose();
     }
-  }, [startSubmit, submitError, submitIsLoading, startDelete, isDeleteLoading]);
+  }, [
+    startSubmit,
+    submitError,
+    submitIsLoading,
+    startDelete,
+    isDeleteLoading,
+    handleClose,
+  ]);
 
   return (
     <Form noValidate onSubmit={handleSubmit(onFormSubmit)}>

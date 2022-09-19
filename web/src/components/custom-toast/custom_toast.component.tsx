@@ -12,9 +12,12 @@ const CustomToast = () => {
   const toastList = useSelector(selectToasts);
   const [toastElements, setToastElements] = useState<JSX.Element[]>([]);
 
-  const handleClose = useCallback((toastID: number) => {
-    dispatch(removeToast(toastID));
-  }, []);
+  const handleClose = useCallback(
+    (toastID: number) => {
+      dispatch(removeToast(toastID));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     setToastElements(
@@ -38,7 +41,7 @@ const CustomToast = () => {
         );
       })
     );
-  }, [toastList]);
+  }, [toastList, handleClose]);
 
   return (
     <ToastContainer className={styles["toast-container"]}>

@@ -18,10 +18,13 @@ const ImageUploader: FC<ImageUploaderProps> = ({ multiUpload, ...props }) => {
   const dispatch = useDispatch();
   const uploaderRef = createRef<HTMLInputElement>();
 
+  // handle single file upload
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target && event.target.files && event.target.files.length > 0) {
+      // stop previous upload if new upload detected
       dispatch(stopAndRemoveAllStart());
 
+      // upload file
       const files = event.target.files;
       for (let i = 0; i < files.length; i++) {
         dispatch(addUpload(files[i]));
@@ -29,12 +32,15 @@ const ImageUploader: FC<ImageUploaderProps> = ({ multiUpload, ...props }) => {
     }
   };
 
+  // handle multiple file upload
   const onDrop = (files: File[]) => {
     for (let i = 0; i < files.length; i++) {
       dispatch(addUpload(files[i]));
     }
   };
 
+  // configure dropzone for multiple file upload
+  // only allow png/jpg file upload
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       "image/png": [".png"],
@@ -43,11 +49,12 @@ const ImageUploader: FC<ImageUploaderProps> = ({ multiUpload, ...props }) => {
     onDrop,
   });
 
+  // clean up all file upload on unmount
   useEffect(() => {
     return () => {
       dispatch(stopAndRemoveAllStart());
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <>

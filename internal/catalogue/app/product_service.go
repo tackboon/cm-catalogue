@@ -14,6 +14,7 @@ type productRepository interface {
 	DeleteProdcutByID(ctx context.Context, productID int) error
 	GetProductByID(ctx context.Context, productID int) (catalogue.Product, error)
 	GetAllProducts(ctx context.Context, categoryID int, startPosition float64, limit int, filter string, statusFilter catalogue.StatusFilter) ([]catalogue.Product, error)
+	SetProductPosition(ctx context.Context, productID int, position float64) error
 }
 
 type ProductService struct {
@@ -72,6 +73,10 @@ func (p ProductService) GetAllProducts(ctx context.Context, categoryID int, star
 	}
 
 	return p.repo.GetAllProducts(ctx, categoryID, startPosition, limit, filter, statusFilter)
+}
+
+func (p ProductService) SetProductPosition(ctx context.Context, productID int, position float64) error {
+	return p.repo.SetProductPosition(ctx, productID, position)
 }
 
 func productPostChecking(product *catalogue.Product) (err error) {

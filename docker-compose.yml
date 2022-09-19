@@ -5,11 +5,11 @@ services:
   # Postgresql database
   ################################################################
   postgres:
-    image: postgres:14.4-alpine3.16
+    image: postgres:14.5-alpine3.16
     container_name: postgres
     hostname: postgres
     ports:
-      - "5433:5432"
+      - "$PG_PORT:5432"
     volumes:
       - ./docker-volume/postgres/data:/var/lib/postgresql/data
     environment:
@@ -20,7 +20,7 @@ services:
   # Pgadmin serve UI for postgres
   ################################################################
   pgadmin:
-    image: dpage/pgadmin4:6.11
+    image: dpage/pgadmin4:6.13
     user: root
     container_name: pgadmin
     hostname: pgadmin

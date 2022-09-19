@@ -28,10 +28,6 @@ import {
 } from "./customer.selector";
 import { api } from "../../service/openapi/openapi.service";
 
-export function* searchCustomer() {
-  yield* put(fetchAllCustomerDataStart());
-}
-
 export function* fetchAllCustomer() {
   try {
     const { page, limit } = yield* select(selectCustomerPagination);
@@ -125,13 +121,6 @@ export function* setRelationshipFilter() {
   yield* put(fetchAllCustomerDataStart());
 }
 
-export function* onSearchCustomerStart() {
-  yield* takeLatest(
-    CUSTOMER_ACTION_TYPES.SEARCH_CUSTOMER_START,
-    searchCustomer
-  );
-}
-
 export function* onFetchAllCustomerDataStart() {
   yield* takeLatest(
     CUSTOMER_ACTION_TYPES.FETCH_ALL_CUSTOMER_DATA_START,
@@ -169,7 +158,6 @@ export function* onSetSRelationshipFilter() {
 
 export function* customerSagas() {
   yield* all([
-    call(onSearchCustomerStart),
     call(onFetchAllCustomerDataStart),
     call(onCreateCustomerDataStart),
     call(onUpdateCustomerDataStart),

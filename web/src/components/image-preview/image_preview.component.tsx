@@ -21,6 +21,7 @@ const ImagePreview: FC<ImagePreviewProps> = ({
 }) => {
   const circleRef = useRef(null);
 
+  // configure loading bar
   if (circleRef.current) {
     const el = circleRef.current as SVGCircleElement;
     const strokeDashArray = 251;

@@ -321,6 +321,37 @@ func (h HTTPServer) GetAllCategoryProducts(w http.ResponseWriter, r *http.Reques
 	render.Respond(w, r, res)
 }
 
+func (h HTTPServer) SetProductPosition(w http.ResponseWriter, r *http.Request, categoryId int, productId int) {
+	user, err := auth.UserFromCtx(r.Context())
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+
+	if user.Role != "admin" {
+		httperr.Unauthorised("invalid-role", nil, w, r)
+		return
+	}
+
+	type productPositionRequest struct {
+		Position float64 `json:"position"`
+	}
+
+	productPositionPost := productPositionRequest{}
+	if err := render.Decode(r, &productPositionPost); err != nil {
+		httperr.BadRequest("invalid-request", err, w, r)
+		return
+	}
+
+	err = h.productService.SetProductPosition(r.Context(), productId, productPositionPost.Position)
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func appCategoryToResponse(appCategory catalogue.Category) Category {
 	var category Category
 

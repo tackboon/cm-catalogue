@@ -257,6 +257,20 @@ func (p ProductPostgresRepository) GetAllProducts(ctx context.Context, categoryI
 	return appProducts, nil
 }
 
+func (p ProductPostgresRepository) SetProductPosition(ctx context.Context, productID int, position float64) error {
+	stmt := `
+		UPDATE products SET position=$2, updated_at=$3
+		WHERE id=$1;
+	`
+
+	_, err := p.db.Exec(ctx, stmt, productID, position, time.Now())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func productModelToApp(rows pgx.Rows) ([]catalogue.Product, error) {
 	var appProducts []catalogue.Product
 	m := map[int]catalogue.Product{}

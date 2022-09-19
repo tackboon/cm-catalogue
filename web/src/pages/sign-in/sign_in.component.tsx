@@ -12,7 +12,7 @@ import {
   selectUserIsLoading,
 } from "../../store/user/user.selector";
 import {
-  USER_ACTION_TYPES,
+  USER_ERROR_TYPES,
   USER_LOADING_TYPES,
 } from "../../store/user/user.types";
 import LoadingButton from "../../components/loading-button/loading_button.component";
@@ -24,26 +24,28 @@ type SignInFormValues = {
 };
 
 const SignIn = () => {
-  const navigate = useNavigate();
-  const currentUser = useSelector(selectCurrentUser);
-
-  useEffect(() => {
-    if (currentUser) navigate("/categories", { replace: true });
-  }, [currentUser]);
-
   const dispatch = useDispatch();
-  const { [USER_ACTION_TYPES.SIGN_IN_FAILED]: signInError } =
-    useSelector(selectUserError);
-  const { [USER_LOADING_TYPES.SIGN_IN]: signInIsLoading } =
-    useSelector(selectUserIsLoading);
+  const navigate = useNavigate();
   const [isShowPassword, setIsShowPassword] = useState(false);
 
+  // redirect to categories page after sign in
+  const currentUser = useSelector(selectCurrentUser);
+  useEffect(() => {
+    if (currentUser) navigate("/categories", { replace: true });
+  }, [currentUser, navigate]);
+
+  // initialize react-hook-form
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<SignInFormValues>();
 
+  // handle form submit
+  const { [USER_ERROR_TYPES.SIGN_IN]: signInError } =
+    useSelector(selectUserError);
+  const { [USER_LOADING_TYPES.SIGN_IN]: signInIsLoading } =
+    useSelector(selectUserIsLoading);
   const onSubmit = ({ email, password }: SignInFormValues) => {
     dispatch(emailSignInStart(email, password));
   };

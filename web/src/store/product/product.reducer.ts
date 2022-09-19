@@ -1,5 +1,4 @@
 import { AnyAction } from "@reduxjs/toolkit";
-import { stat } from "fs";
 
 import {
   initErrorState,
@@ -13,10 +12,12 @@ import {
   fetchAllProductFailed,
   fetchAllProductSuccess,
   resetProductError,
+  resetProductFilter,
   resetProductList,
   searchProductStart,
   setCategoryID,
   setIsProductLoading,
+  setProductPosition,
   setStatusFilter,
   updateProductFailed,
   updateProductSuccess,
@@ -44,7 +45,7 @@ const INITIAL_STATE: ProductState = {
   products: [],
   pagination: {
     startPosition: 0,
-    limit: 25,
+    limit: 50,
     isLastPage: false,
   },
   filter: "",
@@ -64,6 +65,32 @@ export const productReducer = (
         ...state.isLoading,
         [action.payload.type]: action.payload.status,
       },
+    };
+  }
+
+  if (setStatusFilter.match(action)) {
+    return {
+      ...state,
+      statusFilter: action.payload,
+      pagination: {
+        ...state.pagination,
+        startPosition: 0,
+        isLastPage: false,
+      },
+      products: [],
+    };
+  }
+
+  if (setCategoryID.match(action)) {
+    return {
+      ...state,
+      categoryID: action.payload,
+      pagination: {
+        ...state.pagination,
+        startPosition: 0,
+        isLastPage: false,
+      },
+      products: [],
     };
   }
 
@@ -89,16 +116,10 @@ export const productReducer = (
     };
   }
 
-  if (setStatusFilter.match(action)) {
+  if (resetProductFilter.match(action)) {
     return {
       ...state,
-      statusFilter: action.payload,
-      pagination: {
-        ...state.pagination,
-        startPosition: 0,
-        isLastPage: false,
-      },
-      products: [],
+      filter: "",
     };
   }
 
@@ -126,6 +147,70 @@ export const productReducer = (
       error: {
         ...state.error,
         [PRODUCT_ERROR_TYPE.ADD_PRODUCT]: action.payload,
+      },
+    };
+  }
+
+  if (updateProductSuccess.match(action)) {
+    return {
+      ...state,
+      products: state.products.map((p) => {
+        if (p.id === action.payload.id) {
+          return action.payload;
+        } else {
+          return p;
+        }
+      }),
+      isLoading: {
+        ...state.isLoading,
+        [PRODUCT_LOADING_TYPE.UPDATE_PRODUCT]: false,
+      },
+      error: {
+        ...state.error,
+        [PRODUCT_ERROR_TYPE.UPDATE_PRODUCT]: "",
+      },
+    };
+  }
+
+  if (updateProductFailed.match(action)) {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        [PRODUCT_LOADING_TYPE.UPDATE_PRODUCT]: false,
+      },
+      error: {
+        ...state.error,
+        [PRODUCT_ERROR_TYPE.UPDATE_PRODUCT]: action.payload,
+      },
+    };
+  }
+
+  if (deleteProductSuccess.match(action)) {
+    return {
+      ...state,
+      products: state.products.filter((p) => p.id !== action.payload),
+      isLoading: {
+        ...state.isLoading,
+        [PRODUCT_LOADING_TYPE.DELETE_PRODUCT]: false,
+      },
+      error: {
+        ...state.error,
+        [PRODUCT_ERROR_TYPE.DELETE_PRODUCT]: "",
+      },
+    };
+  }
+
+  if (deleteProductFailed.match(action)) {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        [PRODUCT_LOADING_TYPE.DELETE_PRODUCT]: false,
+      },
+      error: {
+        ...state.error,
+        [PRODUCT_ERROR_TYPE.DELETE_PRODUCT]: action.payload,
       },
     };
   }
@@ -173,80 +258,18 @@ export const productReducer = (
     };
   }
 
-  if (setCategoryID.match(action)) {
+  if (setProductPosition.match(action)) {
     return {
       ...state,
-      categoryID: action.payload,
-      pagination: {
-        ...state.pagination,
-        startPosition: 0,
-        isLastPage: false,
-      },
-      products: [],
-    };
-  }
-
-  if (deleteProductSuccess.match(action)) {
-    return {
-      ...state,
-      products: state.products.filter((p) => p.id !== action.payload),
-      isLoading: {
-        ...state.isLoading,
-        [PRODUCT_LOADING_TYPE.DELETE_PRODUCT]: false,
-      },
-      error: {
-        ...state.error,
-        [PRODUCT_ERROR_TYPE.DELETE_PRODUCT]: "",
-      },
-    };
-  }
-
-  if (deleteProductFailed.match(action)) {
-    return {
-      ...state,
-      isLoading: {
-        ...state.isLoading,
-        [PRODUCT_LOADING_TYPE.DELETE_PRODUCT]: false,
-      },
-      error: {
-        ...state.error,
-        [PRODUCT_ERROR_TYPE.DELETE_PRODUCT]: action.payload,
-      },
-    };
-  }
-
-  if (updateProductSuccess.match(action)) {
-    return {
-      ...state,
-      products: state.products.map((p) => {
-        if (p.id === action.payload.id) {
-          return action.payload;
-        } else {
-          return p;
+      products: state.products.map((product) => {
+        if (product.id === action.payload.id) {
+          return {
+            ...product,
+            position: action.payload.position,
+          };
         }
+        return product;
       }),
-      isLoading: {
-        ...state.isLoading,
-        [PRODUCT_LOADING_TYPE.UPDATE_PRODUCT]: false,
-      },
-      error: {
-        ...state.error,
-        [PRODUCT_ERROR_TYPE.UPDATE_PRODUCT]: "",
-      },
-    };
-  }
-
-  if (updateProductFailed.match(action)) {
-    return {
-      ...state,
-      isLoading: {
-        ...state.isLoading,
-        [PRODUCT_LOADING_TYPE.UPDATE_PRODUCT]: false,
-      },
-      error: {
-        ...state.error,
-        [PRODUCT_ERROR_TYPE.UPDATE_PRODUCT]: action.payload,
-      },
     };
   }
 

@@ -21,6 +21,16 @@ export type SetIsProductLoading = ActionWithPayload<
   }
 >;
 
+export type SetStatusFilter = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.SET_STATUS_FILTER,
+  SELECT_PRODUCT_STATUS
+>;
+
+export type SetCategoryID = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.SET_CATEGORY_ID,
+  number
+>;
+
 export type ResetProductError = ActionWithPayload<
   PRODUCT_ACTION_TYPES.RESET_PRODUCT_ERROR,
   PRODUCT_ERROR_TYPE
@@ -28,10 +38,8 @@ export type ResetProductError = ActionWithPayload<
 
 export type ResetProductList = Action<PRODUCT_ACTION_TYPES.RESET_PRODCUT_LIST>;
 
-export type SetStatusFilter = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.SET_STATUS_FILTER,
-  SELECT_PRODUCT_STATUS
->;
+export type ResetProductFilter =
+  Action<PRODUCT_ACTION_TYPES.RESET_PRODUCT_FILTER>;
 
 export type AddProductStart = ActionWithPayload<
   PRODUCT_ACTION_TYPES.ADD_PRODUCT_START,
@@ -48,6 +56,43 @@ export type AddProductSuccess = ActionWithPayload<
 
 export type AddProductFailed = ActionWithPayload<
   PRODUCT_ACTION_TYPES.ADD_PRODUCT_FAILED,
+  string
+>;
+
+export type UpdateProductStart = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_START,
+  {
+    categoryID: number;
+    productID: number;
+    product: ProductPost;
+  }
+>;
+
+export type UpdateProductSuccess = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS,
+  ProductData
+>;
+
+export type UpdateProductFailed = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_FAILED,
+  string
+>;
+
+export type DeleteProductStart = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.DELETE_PRODUCT_START,
+  {
+    categoryID: number;
+    productID: number;
+  }
+>;
+
+export type DeleteProductSuccess = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.DELETE_PRODUCT_SUCCESS,
+  number
+>;
+
+export type DeleteProductFailed = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.DELETE_PRODUCT_FAILED,
   string
 >;
 
@@ -73,46 +118,12 @@ export type FetchAllProductFailed = ActionWithPayload<
   string
 >;
 
-export type SetCategoryID = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.SET_CATEGORY_ID,
-  number
->;
-
-export type DeleteProductStart = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.DELETE_PRODUCT_START,
+export type SetProductPosition = ActionWithPayload<
+  PRODUCT_ACTION_TYPES.SET_PRODUCT_POSITION,
   {
-    categoryID: number;
-    productID: number;
+    id: number;
+    position: number;
   }
->;
-
-export type DeleteProductSuccess = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.DELETE_PRODUCT_SUCCESS,
-  number
->;
-
-export type DeleteProductFailed = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.DELETE_PRODUCT_FAILED,
-  string
->;
-
-export type UpdateProductStart = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_START,
-  {
-    categoryID: number;
-    productID: number;
-    product: ProductPost;
-  }
->;
-
-export type UpdateProductSuccess = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS,
-  ProductData
->;
-
-export type UpdateProductFailed = ActionWithPayload<
-  PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_FAILED,
-  string
 >;
 
 export const setIsProductLoading = withMatcher(
@@ -121,6 +132,16 @@ export const setIsProductLoading = withMatcher(
       type,
       status,
     })
+);
+
+export const setStatusFilter = withMatcher(
+  (status: SELECT_PRODUCT_STATUS): SetStatusFilter =>
+    createAction(PRODUCT_ACTION_TYPES.SET_STATUS_FILTER, status)
+);
+
+export const setCategoryID = withMatcher(
+  (categoryID: number): SetCategoryID =>
+    createAction(PRODUCT_ACTION_TYPES.SET_CATEGORY_ID, categoryID)
 );
 
 export const resetProductError = withMatcher(
@@ -132,9 +153,9 @@ export const resetProductList = withMatcher(
   (): ResetProductList => createAction(PRODUCT_ACTION_TYPES.RESET_PRODCUT_LIST)
 );
 
-export const setStatusFilter = withMatcher(
-  (status: SELECT_PRODUCT_STATUS): SetStatusFilter =>
-    createAction(PRODUCT_ACTION_TYPES.SET_STATUS_FILTER, status)
+export const resetProductFilter = withMatcher(
+  (): ResetProductFilter =>
+    createAction(PRODUCT_ACTION_TYPES.RESET_PRODUCT_FILTER)
 );
 
 export const addProductStart = withMatcher(
@@ -153,6 +174,47 @@ export const addProductSuccess = withMatcher(
 export const addProductFailed = withMatcher(
   (error: string): AddProductFailed =>
     createAction(PRODUCT_ACTION_TYPES.ADD_PRODUCT_FAILED, error)
+);
+
+export const updateProductStart = withMatcher(
+  (
+    categoryID: number,
+    productID: number,
+    product: ProductPost
+  ): UpdateProductStart =>
+    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_START, {
+      categoryID,
+      productID,
+      product,
+    })
+);
+
+export const updateProductSuccess = withMatcher(
+  (product: ProductData): UpdateProductSuccess =>
+    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS, product)
+);
+
+export const updateProductFailed = withMatcher(
+  (error: string): UpdateProductFailed =>
+    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_FAILED, error)
+);
+
+export const deleteProductStart = withMatcher(
+  (categoryID: number, productID: number): DeleteProductStart =>
+    createAction(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_START, {
+      categoryID,
+      productID,
+    })
+);
+
+export const deleteProductSuccess = withMatcher(
+  (productID: number): DeleteProductSuccess =>
+    createAction(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_SUCCESS, productID)
+);
+
+export const deleteProductFailed = withMatcher(
+  (error: string): DeleteProductFailed =>
+    createAction(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_FAILED, error)
 );
 
 export const searchProductStart = withMatcher(
@@ -183,48 +245,7 @@ export const fetchAllProductFailed = withMatcher(
     createAction(PRODUCT_ACTION_TYPES.FETCH_ALL_PRODUCT_FAILED, error)
 );
 
-export const setCategoryID = withMatcher(
-  (categoryID: number): SetCategoryID =>
-    createAction(PRODUCT_ACTION_TYPES.SET_CATEGORY_ID, categoryID)
-);
-
-export const deleteProductStart = withMatcher(
-  (categoryID: number, productID: number): DeleteProductStart =>
-    createAction(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_START, {
-      categoryID,
-      productID,
-    })
-);
-
-export const deleteProductSuccess = withMatcher(
-  (productID: number): DeleteProductSuccess =>
-    createAction(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_SUCCESS, productID)
-);
-
-export const deleteProductFailed = withMatcher(
-  (error: string): DeleteProductFailed =>
-    createAction(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_FAILED, error)
-);
-
-export const updateProductStart = withMatcher(
-  (
-    categoryID: number,
-    productID: number,
-    product: ProductPost
-  ): UpdateProductStart =>
-    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_START, {
-      categoryID,
-      productID,
-      product,
-    })
-);
-
-export const updateProductSuccess = withMatcher(
-  (product: ProductData): UpdateProductSuccess =>
-    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS, product)
-);
-
-export const updateProductFailed = withMatcher(
-  (error: string): UpdateProductFailed =>
-    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_FAILED, error)
+export const setProductPosition = withMatcher(
+  (id: number, position: number): SetProductPosition =>
+    createAction(PRODUCT_ACTION_TYPES.SET_PRODUCT_POSITION, { id, position })
 );

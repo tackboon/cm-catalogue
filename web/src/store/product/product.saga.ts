@@ -13,6 +13,7 @@ import {
   fetchAllProductSuccess,
   resetProductList,
   setIsProductLoading,
+  SetProductPosition,
   updateProductFailed,
   UpdateProductStart,
   updateProductSuccess,
@@ -149,8 +150,20 @@ export function* updateProduct({ payload }: UpdateProductStart) {
   }
 }
 
-export function* onAddProductStart() {
-  yield* takeLatest(PRODUCT_ACTION_TYPES.ADD_PRODUCT_START, addProduct);
+export function* updateProductPosition({ payload }: SetProductPosition) {
+  try {
+    const categoryID = yield* select(selectCategoryID);
+    yield* call(
+      [api.ProductAPI, api.ProductAPI.setProductPosition],
+      categoryID,
+      payload.id,
+      {
+        position: payload.position,
+      }
+    );
+  } catch (error) {
+    console.error("failed to set product position");
+  }
 }
 
 export function* onSearchProductStart() {
@@ -172,6 +185,10 @@ export function* onSetStatusFilter() {
   yield* takeLatest(PRODUCT_ACTION_TYPES.SET_STATUS_FILTER, fetchAllProducts);
 }
 
+export function* onAddProductStart() {
+  yield* takeLatest(PRODUCT_ACTION_TYPES.ADD_PRODUCT_START, addProduct);
+}
+
 export function* onDeleteProductStart() {
   yield* takeLatest(PRODUCT_ACTION_TYPES.DELETE_PRODUCT_START, deleteProduct);
 }
@@ -180,14 +197,22 @@ export function* onUpdateProductStart() {
   yield* takeLatest(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_START, updateProduct);
 }
 
+export function* onSetProductPosition() {
+  yield* takeLatest(
+    PRODUCT_ACTION_TYPES.SET_PRODUCT_POSITION,
+    updateProductPosition
+  );
+}
+
 export function* productSagas() {
   yield* all([
-    call(onAddProductStart),
     call(onSearchProductStart),
     call(onFetchAllProductStart),
-    call(onSetCategoryID),
     call(onSetStatusFilter),
+    call(onSetCategoryID),
+    call(onAddProductStart),
     call(onDeleteProductStart),
     call(onUpdateProductStart),
+    call(onSetProductPosition),
   ]);
 }

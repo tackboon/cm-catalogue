@@ -48,8 +48,8 @@ const CustomerForm: FC<CustomerFormProps> = ({
   submitIsLoading,
 }) => {
   const dispatch = useDispatch();
-  const [startSubmit, setStartSubmit] = useState(false);
 
+  // initialize react-hook-form
   const {
     handleSubmit,
     register,
@@ -68,23 +68,25 @@ const CustomerForm: FC<CustomerFormProps> = ({
     },
   });
 
+  // handle form submit
+  const [startSubmit, setStartSubmit] = useState(false);
   const onFormSubmit = (data: CustomerFormValues) => {
     onSubmit(data);
     setStartSubmit(true);
   };
 
+  // clean up form and close dialog
   const handleClose = useCallback(() => {
     reset();
     dispatch(resetCustomerError(CUSTOMER_ERROR_TYPES.CREATE_CUSTOMER_DATA));
     dispatch(resetCustomerError(CUSTOMER_ERROR_TYPES.UPDATE_CUSTOMER_DATA));
     onClose();
-  }, []);
+  }, [dispatch, reset, onClose]);
 
+  // handle delete customer
   const [startDelete, setStartDelete] = useState(false);
-
   const { [CUSTOMER_LOADING_TYPES.DELETE_CUSTOMER_DATA]: isDeleteLoading } =
     useSelector(selectCustomerIsLoading);
-
   const handleDelete = () => {
     if (initData) {
       setStartDelete(true);
@@ -92,6 +94,7 @@ const CustomerForm: FC<CustomerFormProps> = ({
     }
   };
 
+  // trigger clean up and close on submit successful
   useEffect(() => {
     if (
       (startSubmit && submitError === "" && !submitIsLoading) ||
@@ -99,7 +102,14 @@ const CustomerForm: FC<CustomerFormProps> = ({
     ) {
       handleClose();
     }
-  }, [startSubmit, submitError, submitIsLoading, startDelete, isDeleteLoading]);
+  }, [
+    startSubmit,
+    submitError,
+    submitIsLoading,
+    startDelete,
+    isDeleteLoading,
+    handleClose,
+  ]);
 
   return (
     <Form noValidate onSubmit={handleSubmit(onFormSubmit)}>

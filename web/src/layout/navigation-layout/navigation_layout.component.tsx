@@ -60,25 +60,18 @@ const NavigationLayout = () => {
                       </span>
                     }
                   >
-                    <NavDropdown.Item as="div">
-                      <span
-                        className={styles["sign-out"]}
-                        onClick={() => dispatch(signOutStart())}
-                      >
-                        Sign Out
-                      </span>
+                    <NavDropdown.Item
+                      as="div"
+                      onClick={() => dispatch(signOutStart())}
+                    >
+                      <span className={styles["sign-out"]}>Sign Out</span>
                     </NavDropdown.Item>
                   </NavDropdown>
                 </Nav>
 
                 <Nav className="d-lg-none">
-                  <Nav.Link>
-                    <span
-                      className={styles["sign-out"]}
-                      onClick={() => dispatch(signOutStart())}
-                    >
-                      Sign Out
-                    </span>
+                  <Nav.Link onClick={() => dispatch(signOutStart())}>
+                    <span className={styles["sign-out"]}>Sign Out</span>
                   </Nav.Link>
                 </Nav>
               </>

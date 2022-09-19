@@ -14,6 +14,7 @@ const SearchBar: FC<SearchbarProps> = ({ placeholder, onSearch, ...props }) => {
     debounceSearch(event.target.value);
   };
 
+  // auto search after 500ms of input changed
   const debounceSearch = useRef(
     debounce((criteria: string) => {
       onSearch(criteria);

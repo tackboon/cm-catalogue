@@ -1,6 +1,6 @@
 module github.com/tackboon/cm-catalogue/internal/common
 
-go 1.18
+go 1.19
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
@@ -12,7 +12,6 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	google.golang.org/api v0.91.0
 	google.golang.org/grpc v1.48.0
-	google.golang.org/protobuf v1.28.1
 )
 
 require (
@@ -45,4 +44,5 @@ require (
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220805133916-01dd62135a58 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 )
