@@ -19,3 +19,8 @@ export const selectUserIsLoading = createSelector(
   selectUserReducer,
   (user) => user.isLoading
 );
+
+export const selectUserToken = createSelector(
+  selectUserReducer,
+  (user) => user.token
+);

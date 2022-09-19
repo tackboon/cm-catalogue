@@ -8,11 +8,17 @@ import {
   CustomerApi,
   CashBookApi,
 } from "../../openapi/customer";
+import {
+  Configuration as CatalogueConfig,
+  CategoriesApi,
+  ProductsApi,
+} from "../../openapi/catalogue";
 
 const API_HOST = process.env.REACT_APP_API_HOST || "http://localhost";
 const BASE_PATH = {
   userAPI: API_HOST + "/api/v1/users",
   customerAPI: API_HOST + "/api/v1/customers",
+  catalogueAPI: API_HOST + "/api/v1/catalogue",
 };
 
 const customAxios = axios.create();
@@ -35,6 +41,8 @@ class OpenAPi {
   UserAPI: UserApi;
   CustomerAPI: CustomerApi;
   CashBookAPI: CashBookApi;
+  CategoryAPI: CategoriesApi;
+  ProductAPI: ProductsApi;
 
   constructor() {
     this.UserAPI = new UserApi(
@@ -52,6 +60,16 @@ class OpenAPi {
       BASE_PATH.customerAPI,
       customAxios
     );
+    this.CategoryAPI = new CategoriesApi(
+      new CatalogueConfig({ accessToken: "" }),
+      BASE_PATH.catalogueAPI,
+      customAxios
+    );
+    this.ProductAPI = new ProductsApi(
+      new CatalogueConfig({ accessToken: "" }),
+      BASE_PATH.catalogueAPI,
+      customAxios
+    );
   }
 
   setAuthConfig(accessToken: string) {
@@ -59,6 +77,7 @@ class OpenAPi {
 
     this.setUserAPI();
     this.setCustomerAPI();
+    this.setCatalogueAPI();
   }
 
   setUserAPI() {
@@ -83,6 +102,24 @@ class OpenAPi {
     this.CashBookAPI = new CashBookApi(
       configuration,
       BASE_PATH.customerAPI,
+      customAxios
+    );
+  }
+
+  setCatalogueAPI() {
+    const configuration = new CatalogueConfig({
+      accessToken: this.accessToken,
+    });
+
+    this.CategoryAPI = new CategoriesApi(
+      configuration,
+      BASE_PATH.catalogueAPI,
+      customAxios
+    );
+
+    this.ProductAPI = new ProductsApi(
+      configuration,
+      BASE_PATH.catalogueAPI,
       customAxios
     );
   }

@@ -105,7 +105,7 @@ export interface CashBookRecordPost {
      * @type {string}
      * @memberof CashBookRecordPost
      */
-    'description'?: string;
+    'description': string;
 }
 
 export const CashBookRecordPostTypeEnum = {
@@ -218,7 +218,7 @@ export interface CustomerPost {
      * @type {string}
      * @memberof CustomerPost
      */
-    'code'?: string;
+    'code': string;
     /**
      * 
      * @type {string}
@@ -230,7 +230,7 @@ export interface CustomerPost {
      * @type {string}
      * @memberof CustomerPost
      */
-    'contact'?: string;
+    'contact': string;
     /**
      * 
      * @type {string}
@@ -242,25 +242,25 @@ export interface CustomerPost {
      * @type {string}
      * @memberof CustomerPost
      */
-    'address'?: string;
+    'address': string;
     /**
      * 
      * @type {string}
      * @memberof CustomerPost
      */
-    'postcode'?: string;
+    'postcode': string;
     /**
      * 
      * @type {string}
      * @memberof CustomerPost
      */
-    'city'?: string;
+    'city': string;
     /**
      * 
      * @type {string}
      * @memberof CustomerPost
      */
-    'state'?: string;
+    'state': string;
 }
 
 export const CustomerPostRelationshipEnum = {

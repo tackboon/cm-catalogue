@@ -5,13 +5,16 @@ import (
 	"net/http"
 	"strings"
 
-	"firebase.google.com/go/auth"
-	"github.com/tackboon97/cm-catalogue/internal/common/errors"
-	"github.com/tackboon97/cm-catalogue/internal/common/server/httperr"
+	"github.com/tackboon/cm-catalogue/internal/common/errors"
+	"github.com/tackboon/cm-catalogue/internal/common/server/httperr"
 )
 
-type FirebaseAuthHttp struct {
-	AuthClient *auth.Client
+type authProvider interface {
+	VerifyToken(ctx context.Context, authToken string) (User, error)
+}
+
+type AuthHTTP struct {
+	AuthProvider authProvider
 }
 
 type User struct {
@@ -27,7 +30,7 @@ const (
 	userContextKey ctxKey = "user_context_key"
 )
 
-func (a FirebaseAuthHttp) Middleware(next http.Handler) http.Handler {
+func (a AuthHTTP) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -37,35 +40,20 @@ func (a FirebaseAuthHttp) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		token, err := a.AuthClient.VerifyIDToken(ctx, bearerToken)
+		user, err := a.AuthProvider.VerifyToken(ctx, bearerToken)
 		if err != nil {
 			httperr.Unauthorised("failed-to-verify-token", err, w, r)
 			return
 		}
 
-		role := token.Claims["role"]
-		if role == nil {
-			role = "user"
-		}
-
-		displayName := token.Claims["name"]
-		if displayName == nil {
-			displayName = "Anonymous"
-		}
-
-		ctx = context.WithValue(ctx, userContextKey, User{
-			UUID:        token.UID,
-			Email:       token.Claims["email"].(string),
-			Role:        role.(string),
-			DisplayName: displayName.(string),
-		})
+		ctx = context.WithValue(ctx, userContextKey, user)
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})
 }
 
-func (a FirebaseAuthHttp) tokenFromHeader(r *http.Request) string {
+func (a AuthHTTP) tokenFromHeader(r *http.Request) string {
 	authHeader := r.Header.Get("Authorization")
 
 	if len(authHeader) > 7 && strings.ToLower(authHeader[0:6]) == "bearer" {

@@ -38,6 +38,7 @@ export const cashBookReducer = (
     return {
       ...state,
       isLoading: {
+        ...state.isLoading,
         [action.payload.type]: action.payload.status,
       },
     };
@@ -47,17 +48,27 @@ export const cashBookReducer = (
     return {
       ...state,
       error: {
+        ...state.error,
         [CASH_BOOK_ERROR_TYPES.ADD_CASH_BOOK_RECORD]: "",
       },
-      isLoading: { [CASH_BOOK_LOADING_TYPES.ADD_CASH_BOOK_RECORD]: false },
+      isLoading: {
+        ...state.isLoading,
+        [CASH_BOOK_LOADING_TYPES.ADD_CASH_BOOK_RECORD]: false,
+      },
     };
   }
 
   if (addCashBookRecordFailed.match(action)) {
     return {
       ...state,
-      error: { [CASH_BOOK_ERROR_TYPES.ADD_CASH_BOOK_RECORD]: action.payload },
-      isLoading: { [CASH_BOOK_LOADING_TYPES.ADD_CASH_BOOK_RECORD]: false },
+      error: {
+        ...state.error,
+        [CASH_BOOK_ERROR_TYPES.ADD_CASH_BOOK_RECORD]: action.payload,
+      },
+      isLoading: {
+        ...state.isLoading,
+        [CASH_BOOK_LOADING_TYPES.ADD_CASH_BOOK_RECORD]: false,
+      },
     };
   }
 
@@ -65,9 +76,13 @@ export const cashBookReducer = (
     return {
       ...state,
       error: {
+        ...state.error,
         [CASH_BOOK_ERROR_TYPES.DELETE_CASH_BOOK_RECORD]: "",
       },
-      isLoading: { [CASH_BOOK_LOADING_TYPES.DELETE_CASH_BOOK_RECORD]: false },
+      isLoading: {
+        ...state.isLoading,
+        [CASH_BOOK_LOADING_TYPES.DELETE_CASH_BOOK_RECORD]: false,
+      },
       records: state.records.filter((r) => r.id !== action.payload),
     };
   }
@@ -76,9 +91,13 @@ export const cashBookReducer = (
     return {
       ...state,
       error: {
+        ...state.error,
         [CASH_BOOK_ERROR_TYPES.DELETE_CASH_BOOK_RECORD]: action.payload,
       },
-      isLoading: { [CASH_BOOK_LOADING_TYPES.DELETE_CASH_BOOK_RECORD]: false },
+      isLoading: {
+        ...state.isLoading,
+        [CASH_BOOK_LOADING_TYPES.DELETE_CASH_BOOK_RECORD]: false,
+      },
     };
   }
 
@@ -87,9 +106,11 @@ export const cashBookReducer = (
       ...state,
       records: action.payload,
       error: {
+        ...state.error,
         [CASH_BOOK_ERROR_TYPES.FETCH_CASH_BOOK_RECORD]: "",
       },
       isLoading: {
+        ...state.isLoading,
         [CASH_BOOK_LOADING_TYPES.FETCH_CASH_BOOK_RECORD]: false,
       },
     };
@@ -99,9 +120,11 @@ export const cashBookReducer = (
     return {
       ...state,
       error: {
+        ...state.error,
         [CASH_BOOK_ERROR_TYPES.FETCH_CASH_BOOK_RECORD]: action.payload,
       },
       isLoading: {
+        ...state.isLoading,
         [CASH_BOOK_LOADING_TYPES.FETCH_CASH_BOOK_RECORD]: false,
       },
     };

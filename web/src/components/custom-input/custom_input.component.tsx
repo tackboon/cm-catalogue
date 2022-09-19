@@ -20,12 +20,15 @@ const CustomInput: FC<CustomInputProps> = forwardRef(
 
       switch (type) {
         case CustomInputType.ALPHA:
+          // Only allow alpha input
           v = value.replace(/[^A-Za-z ]/g, "");
           break;
         case CustomInputType.ALPHA_NUMERIC:
+          // Only allow alpha numeric input
           v = value.replace(/\W/g, "");
           break;
         case CustomInputType.NUMERIC:
+          // Only allow numeric input
           v = value.replace(/\D/g, "");
           break;
       }

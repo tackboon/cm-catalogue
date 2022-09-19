@@ -1,18 +1,15 @@
 package server
 
 import (
-	"context"
 	"net/http"
 	"os"
 	"strings"
 
-	firebase "firebase.google.com/go"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/sirupsen/logrus"
-	"github.com/tackboon97/cm-catalogue/internal/common/auth"
-	"google.golang.org/api/option"
+	"github.com/tackboon/cm-catalogue/internal/common/auth"
 )
 
 func RunHTTPServer(h http.Handler) {
@@ -57,20 +54,6 @@ func addCorsMiddleware(r *chi.Mux) {
 }
 
 func addAuthMiddleware(r *chi.Mux) {
-	var opts []option.ClientOption
-	if file := os.Getenv("SERVICE_ACCOUNT_FILE"); file != "" {
-		opts = append(opts, option.WithCredentialsFile(file))
-	}
-
-	firebaseApp, err := firebase.NewApp(context.Background(), nil, opts...)
-	if err != nil {
-		logrus.WithError(err).Panic("Unable to initialize firebase app.")
-	}
-
-	authClient, err := firebaseApp.Auth(context.Background())
-	if err != nil {
-		logrus.WithError(err).Panic("Unable to create firebase auth client.")
-	}
-
-	r.Use(auth.FirebaseAuthHttp{AuthClient: authClient}.Middleware)
+	firebaseAuth := auth.NewFirebaseAuth()
+	r.Use(auth.AuthHTTP{AuthProvider: firebaseAuth}.Middleware)
 }

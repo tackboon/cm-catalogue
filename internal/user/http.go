@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-chi/render"
 	"github.com/sirupsen/logrus"
-	"github.com/tackboon97/cm-catalogue/internal/common/auth"
-	"github.com/tackboon97/cm-catalogue/internal/common/server/httperr"
+	"github.com/tackboon/cm-catalogue/internal/common/auth"
+	"github.com/tackboon/cm-catalogue/internal/common/server/httperr"
 )
 
 type HttpServer struct{}

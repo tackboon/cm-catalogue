@@ -1,0 +1,6 @@
+CREATE TABLE catalogue_files (
+  id VARCHAR(255) PRIMARY KEY,
+  path VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

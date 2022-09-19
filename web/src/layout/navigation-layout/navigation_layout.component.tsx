@@ -40,14 +40,9 @@ const NavigationLayout = () => {
             {currentUser ? (
               <>
                 <Nav className="ms-auto">
-                  <NavDropdown title="Categories">
-                    <NavDropdown.Item as="div">
-                      <Link to="/categories/add-category">
-                        Add Category - 添加分类
-                      </Link>
-                    </NavDropdown.Item>
-                    {/* <NavDropdown.Divider /> */}
-                  </NavDropdown>
+                  <Nav.Link as="span">
+                    <Link to="/categories">Categories</Link>
+                  </Nav.Link>
                 </Nav>
 
                 <Nav>
@@ -65,25 +60,18 @@ const NavigationLayout = () => {
                       </span>
                     }
                   >
-                    <NavDropdown.Item as="div">
-                      <span
-                        className={styles["sign-out"]}
-                        onClick={() => dispatch(signOutStart())}
-                      >
-                        Sign Out
-                      </span>
+                    <NavDropdown.Item
+                      as="div"
+                      onClick={() => dispatch(signOutStart())}
+                    >
+                      <span className={styles["sign-out"]}>Sign Out</span>
                     </NavDropdown.Item>
                   </NavDropdown>
                 </Nav>
 
                 <Nav className="d-lg-none">
-                  <Nav.Link>
-                    <span
-                      className={styles["sign-out"]}
-                      onClick={() => dispatch(signOutStart())}
-                    >
-                      Sign Out
-                    </span>
+                  <Nav.Link onClick={() => dispatch(signOutStart())}>
+                    <span className={styles["sign-out"]}>Sign Out</span>
                   </Nav.Link>
                 </Nav>
               </>
@@ -101,7 +89,7 @@ const NavigationLayout = () => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <div className={styles["content-wrapper"]}>
+      <div id="content-wrapper" className={styles["content-wrapper"]}>
         <Outlet />
       </div>
     </>

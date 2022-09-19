@@ -5,11 +5,10 @@ import (
 
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 	"github.com/go-chi/render"
-	"github.com/sirupsen/logrus"
-	"github.com/tackboon97/cm-catalogue/internal/common/auth"
-	"github.com/tackboon97/cm-catalogue/internal/common/server/httperr"
-	"github.com/tackboon97/cm-catalogue/internal/customer/app"
-	customer "github.com/tackboon97/cm-catalogue/internal/customer/domain"
+	"github.com/tackboon/cm-catalogue/internal/common/auth"
+	"github.com/tackboon/cm-catalogue/internal/common/server/httperr"
+	"github.com/tackboon/cm-catalogue/internal/customer/app"
+	customer "github.com/tackboon/cm-catalogue/internal/customer/domain"
 )
 
 type HttpServer struct {
@@ -22,56 +21,6 @@ func NewHttpServer(customerService app.CustomerService, cashbookService app.Cash
 		customerService: customerService,
 		cashbookService: cashbookService,
 	}
-}
-
-func (h HttpServer) GetAllCustomersData(w http.ResponseWriter, r *http.Request, params GetAllCustomersDataParams) {
-	var page int
-	var limit int
-	var filter string
-	var relationshipFilter customer.RelationshipFilter
-
-	if params.Page == nil {
-		page = 0
-	} else {
-		page = *params.Page
-	}
-
-	if params.Limit == nil {
-		limit = 0
-	} else {
-		limit = *params.Limit
-	}
-
-	if params.Filter == nil {
-		filter = ""
-	} else {
-		filter = *params.Filter
-	}
-
-	if string(*params.RelationshipFilter) == string(customer.InCooperationFilter) {
-		relationshipFilter = customer.InCooperationFilter
-	} else if string(*params.RelationshipFilter) == string(customer.SuspendedFilter) {
-		relationshipFilter = customer.SuspendedFilter
-	} else {
-		relationshipFilter = customer.ALLFilter
-	}
-
-	customers, pagination, err := h.customerService.GetAllCustomers(r.Context(), page, limit, filter, relationshipFilter)
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
-
-	res := Customers{
-		Data: appCustomersToResponse(customers),
-		Pagination: Pagination{
-			Count:      pagination.Count,
-			Page:       pagination.Page,
-			TotalCount: pagination.TotalCount,
-		},
-	}
-
-	render.Respond(w, r, res)
 }
 
 func (h HttpServer) CreateCustomerData(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +44,7 @@ func (h HttpServer) CreateCustomerData(w http.ResponseWriter, r *http.Request) {
 	var customerRelationship customer.Relationship
 	if string(customerPost.Relationship) == string(customer.Suspended) {
 		customerRelationship = customer.Suspended
-	} else {
+	} else if string(customerPost.Relationship) == string(customer.InCooperation) {
 		customerRelationship = customer.InCooperation
 	}
 
@@ -118,6 +67,53 @@ func (h HttpServer) CreateCustomerData(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	h.GetCustomerDataByID(w, r, newID)
+}
+
+func (h HttpServer) UpdateCustomerData(w http.ResponseWriter, r *http.Request, customerId int) {
+	user, err := auth.UserFromCtx(r.Context())
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+
+	if user.Role != "admin" {
+		httperr.Unauthorised("invalid-role", nil, w, r)
+		return
+	}
+
+	customerPost := CustomerPost{}
+	if err := render.Decode(r, &customerPost); err != nil {
+		httperr.BadRequest("invalid-request", err, w, r)
+		return
+	}
+
+	var customerRelationship customer.Relationship
+	if string(customerPost.Relationship) == string(customer.Suspended) {
+		customerRelationship = customer.Suspended
+	} else if string(customerPost.Relationship) == string(customer.InCooperation) {
+		customerRelationship = customer.InCooperation
+	}
+
+	customer := customer.Customer{
+		ID:           customerId,
+		Code:         customerPost.Code,
+		Name:         customerPost.Name,
+		Contact:      customerPost.Contact,
+		Relationship: customerRelationship,
+		Address:      customerPost.Address,
+		Postcode:     customerPost.Postcode,
+		City:         customerPost.City,
+		State:        customerPost.State,
+	}
+
+	err = h.customerService.UpdateCustomerByID(r.Context(), customer)
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	h.GetCustomerDataByID(w, r, customerId)
 }
 
 func (h HttpServer) DeleteCutomerData(w http.ResponseWriter, r *http.Request, customerId int) {
@@ -151,62 +147,51 @@ func (h HttpServer) GetCustomerDataByID(w http.ResponseWriter, r *http.Request, 
 	render.Respond(w, r, res)
 }
 
-func (h HttpServer) UpdateCustomerData(w http.ResponseWriter, r *http.Request, customerId int) {
-	user, err := auth.UserFromCtx(r.Context())
+func (h HttpServer) GetAllCustomersData(w http.ResponseWriter, r *http.Request, params GetAllCustomersDataParams) {
+	page := 0
+	limit := 0
+	filter := ""
+	relationshipFilter := customer.ALLFilter
+
+	if params.Page != nil {
+		page = *params.Page
+	}
+
+	if params.Limit != nil {
+		limit = *params.Limit
+	}
+
+	if params.Filter != nil {
+		filter = *params.Filter
+	}
+
+	if params.RelationshipFilter != nil {
+		if string(*params.RelationshipFilter) == string(customer.InCooperationFilter) {
+			relationshipFilter = customer.InCooperationFilter
+		} else if string(*params.RelationshipFilter) == string(customer.SuspendedFilter) {
+			relationshipFilter = customer.SuspendedFilter
+		}
+	}
+
+	customers, pagination, err := h.customerService.GetAllCustomers(
+		r.Context(),
+		page,
+		limit,
+		filter,
+		relationshipFilter,
+	)
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
 		return
 	}
 
-	if user.Role != "admin" {
-		httperr.Unauthorised("invalid-role", nil, w, r)
-		return
-	}
-
-	customerPost := CustomerPost{}
-	if err := render.Decode(r, &customerPost); err != nil {
-		httperr.BadRequest("invalid-request", err, w, r)
-		return
-	}
-
-	var customerRelationship customer.Relationship
-	if string(customerPost.Relationship) == string(customer.Suspended) {
-		customerRelationship = customer.Suspended
-	} else {
-		customerRelationship = customer.InCooperation
-	}
-
-	customer := customer.Customer{
-		ID:           customerId,
-		Code:         customerPost.Code,
-		Name:         customerPost.Name,
-		Contact:      customerPost.Contact,
-		Relationship: customerRelationship,
-		Address:      customerPost.Address,
-		Postcode:     customerPost.Postcode,
-		City:         customerPost.City,
-		State:        customerPost.State,
-	}
-
-	err = h.customerService.UpdateCustomer(r.Context(), customer)
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	h.GetCustomerDataByID(w, r, customerId)
-}
-
-func (h HttpServer) GetCashBookRecords(w http.ResponseWriter, r *http.Request, customerId int, params GetCashBookRecordsParams) {
-	cashbooks, err := h.cashbookService.GetCashBookRecords(r.Context(), customerId, params.StartAt, params.EndAt)
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
-
-	res := CashBookRecords{
-		Data: appCashbooksToResponse(cashbooks),
+	res := Customers{
+		Data: appCustomersToResponse(customers),
+		Pagination: Pagination{
+			Count:      pagination.Count,
+			Page:       pagination.Page,
+			TotalCount: pagination.TotalCount,
+		},
 	}
 
 	render.Respond(w, r, res)
@@ -226,7 +211,6 @@ func (h HttpServer) CreateCashBookRecord(w http.ResponseWriter, r *http.Request,
 
 	cashBookPost := CashBookRecordPost{}
 	if err := render.Decode(r, &cashBookPost); err != nil {
-		logrus.Debug(err)
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
@@ -234,7 +218,7 @@ func (h HttpServer) CreateCashBookRecord(w http.ResponseWriter, r *http.Request,
 	var cashbookType customer.CashBookType
 	if string(cashBookPost.Type) == string(customer.Debit) {
 		cashbookType = customer.Debit
-	} else {
+	} else if string(cashBookPost.Type) == string(customer.Credit) {
 		cashbookType = customer.Credit
 	}
 
@@ -267,7 +251,7 @@ func (h HttpServer) DeleteCashBookRecord(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	err = h.cashbookService.DeleteCashBookRecord(r.Context(), customerId, cashBookRecordId)
+	err = h.cashbookService.DeleteCashBookRecord(r.Context(), cashBookRecordId)
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
 	}
@@ -275,38 +259,34 @@ func (h HttpServer) DeleteCashBookRecord(w http.ResponseWriter, r *http.Request,
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (h HttpServer) GetCashBookRecords(w http.ResponseWriter, r *http.Request, customerId int, params GetCashBookRecordsParams) {
+	cashbooks, err := h.cashbookService.GetCashBookRecords(r.Context(), customerId, params.StartAt, params.EndAt)
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+
+	res := CashBookRecords{
+		Data: appCashbooksToResponse(cashbooks),
+	}
+
+	render.Respond(w, r, res)
+}
+
 func appCustomerToResponse(appCustomer customer.Customer) Customer {
 	c := Customer{
 		Id:                  appCustomer.ID,
+		Code:                appCustomer.Code,
 		Name:                appCustomer.Name,
 		Relationship:        string(appCustomer.Relationship),
+		Contact:             appCustomer.Contact,
+		Address:             appCustomer.Address,
+		Postcode:            appCustomer.Postcode,
+		City:                appCustomer.City,
+		State:               appCustomer.State,
 		TotalUnbilledAmount: appCustomer.TotalUnbilledAmount,
 		CreatedAt:           appCustomer.CreatedAt,
 		UpdatedAt:           appCustomer.UpdatedAt,
-	}
-
-	if appCustomer.Code != nil {
-		c.Code = *appCustomer.Code
-	}
-
-	if appCustomer.Contact != nil {
-		c.Contact = *appCustomer.Contact
-	}
-
-	if appCustomer.Address != nil {
-		c.Address = *appCustomer.Address
-	}
-
-	if appCustomer.Postcode != nil {
-		c.Postcode = *appCustomer.Postcode
-	}
-
-	if appCustomer.City != nil {
-		c.City = *appCustomer.City
-	}
-
-	if appCustomer.State != nil {
-		c.State = *appCustomer.State
 	}
 
 	return c
@@ -328,17 +308,14 @@ func appCashbooksToResponse(appCashbooks []customer.CashBookRecord) []CashBookRe
 
 	for _, item := range appCashbooks {
 		c := CashBookRecord{
-			Id:         item.ID,
-			CustomerId: item.CustomerID,
-			Date:       openapi_types.Date{item.Date},
-			Type:       string(item.Type),
-			Amount:     item.Amount,
-			CreatedAt:  item.CreatedAt,
-			UpdatedAt:  item.UpdatedAt,
-		}
-
-		if item.Description != nil {
-			c.Description = *item.Description
+			Id:          item.ID,
+			CustomerId:  item.CustomerID,
+			Date:        openapi_types.Date{item.Date},
+			Type:        string(item.Type),
+			Amount:      item.Amount,
+			Description: item.Description,
+			CreatedAt:   item.CreatedAt,
+			UpdatedAt:   item.UpdatedAt,
 		}
 
 		cashbooks = append(cashbooks, c)

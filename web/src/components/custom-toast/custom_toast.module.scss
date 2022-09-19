@@ -3,11 +3,10 @@
 @import "~bootstrap/scss/mixins/breakpoints";
 
 .toast-container {
-  position: fixed;
   top: 96px;
   right: 50%;
   transform: translateX(50%);
-  z-index: 999;
+  z-index: 50 !important;
 
   @include media-breakpoint-up(lg) {
     right: 185px;

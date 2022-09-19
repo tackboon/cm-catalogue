@@ -1,18 +1,20 @@
 import { ChangeEvent, FC, InputHTMLAttributes, useEffect, useRef } from "react";
-import { Form, FormControlProps } from "react-bootstrap";
-import { debounce } from "lodash";
+import debounce from "lodash.debounce";
+import { BsSearch } from "react-icons/bs";
+
+import styles from "./search_bar.module.scss";
 
 type SearchbarProps = {
   onSearch: (criteria: string) => void;
   placeholder: string;
-} & InputHTMLAttributes<HTMLInputElement> &
-  FormControlProps;
+} & InputHTMLAttributes<HTMLInputElement>;
 
 const SearchBar: FC<SearchbarProps> = ({ placeholder, onSearch, ...props }) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     debounceSearch(event.target.value);
   };
 
+  // auto search after 500ms of input changed
   const debounceSearch = useRef(
     debounce((criteria: string) => {
       onSearch(criteria);
@@ -25,7 +27,16 @@ const SearchBar: FC<SearchbarProps> = ({ placeholder, onSearch, ...props }) => {
     };
   }, [debounceSearch]);
 
-  return <input {...props} placeholder={placeholder} onChange={handleChange} />;
+  return (
+    <div {...props} style={{ width: "100%", position: "relative" }}>
+      <input
+        className={styles["search-input"]}
+        placeholder={placeholder}
+        onChange={handleChange}
+      />
+      <BsSearch className={styles["search-icon"]} />
+    </div>
+  );
 };
 
 export default SearchBar;

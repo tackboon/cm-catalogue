@@ -26,11 +26,14 @@ export function* updateSession({ payload: token }: SetCurrentSession) {
     if (token) {
       const res = yield* call([api.UserAPI, api.UserAPI.getCurrentUser]);
       yield* put(
-        signInSuccess({
-          email: res.data.email,
-          displayName: res.data.display_name,
-          role: res.data.role,
-        })
+        signInSuccess(
+          {
+            email: res.data.email,
+            displayName: res.data.display_name,
+            role: res.data.role,
+          },
+          token
+        )
       );
     }
   } catch (error) {

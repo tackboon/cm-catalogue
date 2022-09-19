@@ -12,12 +12,15 @@
   }
 
   :global(.dropdown-menu) {
-    background-color: $yellow-400;
+    background-color: $yellow-200;
+    transform: translateX(-25%);
   }
 
   :global(.dropdown-item) {
+    cursor: pointer;
+
     &:hover {
-      background-color: $yellow-500;
+      background-color: $yellow-400;
     }
 
     a:hover {

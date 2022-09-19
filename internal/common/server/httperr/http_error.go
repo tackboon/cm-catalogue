@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
-	"github.com/tackboon97/cm-catalogue/internal/common/errors"
+	"github.com/tackboon/cm-catalogue/internal/common/errors"
 )
 
 func InternalError(slug string, err error, w http.ResponseWriter, r *http.Request) {

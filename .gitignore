@@ -34,3 +34,6 @@ service-account-file.json
 /web/npm-debug.log*
 /web/yarn-debug.log*
 /web/yarn-error.log*
+
+# vs code
+*.code-workspace

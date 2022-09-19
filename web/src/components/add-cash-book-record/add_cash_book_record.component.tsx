@@ -1,9 +1,9 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { BsCalendarFill } from "react-icons/bs";
 import { useForm } from "react-hook-form";
-import DatePicker from "react-datepicker";
+import DatePicker, { ReactDatePicker } from "react-datepicker";
 
 import LoadingButton from "../loading-button/loading_button.component";
 import { CustomerData } from "../../store/customer/customer.types";
@@ -45,6 +45,7 @@ const AddCashBookRecord: FC<AddCashBookRecordProp> = ({
   const { [CASH_BOOK_ERROR_TYPES.ADD_CASH_BOOK_RECORD]: cashBookError } =
     useSelector(selectCashBookError);
   const [startSubmit, setStartSubmit] = useState(false);
+  const datePickerRef = useRef(null);
 
   const {
     handleSubmit,
@@ -61,7 +62,7 @@ const AddCashBookRecord: FC<AddCashBookRecordProp> = ({
   const handleClose = useCallback(() => {
     reset();
     onClose();
-  }, []);
+  }, [onClose, reset]);
 
   const handleDateChange = (date: Date) => {
     setValue("date", date);
@@ -83,11 +84,12 @@ const AddCashBookRecord: FC<AddCashBookRecordProp> = ({
     }
   };
 
+  // auto close dialog after submit successful
   useEffect(() => {
     if (startSubmit && !isLoading && cashBookError === "") {
       handleClose();
     }
-  }, [startSubmit, isLoading, cashBookError]);
+  }, [startSubmit, isLoading, cashBookError, handleClose]);
 
   return (
     <Modal backdrop="static" show={show} onHide={handleClose}>
@@ -103,13 +105,22 @@ const AddCashBookRecord: FC<AddCashBookRecordProp> = ({
             <Form.Label>Date</Form.Label>
             <div className={styles["date-picker-container"]}>
               <DatePicker
+                ref={datePickerRef}
                 className={styles["date-picker"]}
                 dateFormat="dd MMM yyyy"
                 showPopperArrow={false}
                 selected={selectedDate}
                 onChange={handleDateChange}
               />
-              <BsCalendarFill className={styles["date-picker-icon"]} />
+              <BsCalendarFill
+                className={styles["date-picker-icon"]}
+                onClick={() => {
+                  if (datePickerRef.current) {
+                    const el = datePickerRef.current as ReactDatePicker;
+                    el.setFocus();
+                  }
+                }}
+              />
             </div>
           </Form.Group>
 

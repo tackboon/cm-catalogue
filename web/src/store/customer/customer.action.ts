@@ -5,7 +5,7 @@ import {
   createAction,
   withMatcher,
 } from "../../utils/reducer/reducer.util";
-import { Pagination } from "../common/common.types";
+import { CustomerPagination } from "./customer.types";
 import {
   CustomerData,
   CUSTOMER_ACTION_TYPES,
@@ -19,9 +19,9 @@ export type SetIsCustomerLoading = ActionWithPayload<
   { type: CUSTOMER_LOADING_TYPES; isLoading: boolean }
 >;
 
-export type ResetCustomerError = ActionWithPayload<
-  CUSTOMER_ACTION_TYPES.RESET_CUSTOMER_ERROR,
-  CUSTOMER_ERROR_TYPES
+export type SetCustomerFilter = ActionWithPayload<
+  CUSTOMER_ACTION_TYPES.SET_CUSTOMER_FILTER,
+  string
 >;
 
 export type SetRelationshipFilter = ActionWithPayload<
@@ -29,9 +29,14 @@ export type SetRelationshipFilter = ActionWithPayload<
   SELECT_CUSTOMER_RELATIONSHIP
 >;
 
-export type SearchCustomerStart = ActionWithPayload<
-  CUSTOMER_ACTION_TYPES.SEARCH_CUSTOMER_START,
-  { page: number; filter: string }
+export type SetCustomerPagination = ActionWithPayload<
+  CUSTOMER_ACTION_TYPES.SET_CUSTOMER_PAGINATION,
+  number
+>;
+
+export type ResetCustomerError = ActionWithPayload<
+  CUSTOMER_ACTION_TYPES.RESET_CUSTOMER_ERROR,
+  CUSTOMER_ERROR_TYPES
 >;
 
 export type FetchAllCustomerDataStart =
@@ -41,7 +46,7 @@ export type FetchAllCustomerDataSuccess = ActionWithPayload<
   CUSTOMER_ACTION_TYPES.FETCH_ALL_CUSTOMER_DATA_SUCCESS,
   {
     customers: CustomerData[];
-    pagination: Pagination;
+    pagination: CustomerPagination;
   }
 >;
 
@@ -107,9 +112,9 @@ export const setIsCustomerLoading = withMatcher(
     })
 );
 
-export const resetCustomerError = withMatcher(
-  (type: CUSTOMER_ERROR_TYPES): ResetCustomerError =>
-    createAction(CUSTOMER_ACTION_TYPES.RESET_CUSTOMER_ERROR, type)
+export const setCustomerFilter = withMatcher(
+  (filter: string): SetCustomerFilter =>
+    createAction(CUSTOMER_ACTION_TYPES.SET_CUSTOMER_FILTER, filter)
 );
 
 export const setRelationshipFilter = withMatcher(
@@ -117,12 +122,14 @@ export const setRelationshipFilter = withMatcher(
     createAction(CUSTOMER_ACTION_TYPES.SET_RELATIONSHIP_FILTER, value)
 );
 
-export const searchCustomerStart = withMatcher(
-  (page: number, filter: string): SearchCustomerStart =>
-    createAction(CUSTOMER_ACTION_TYPES.SEARCH_CUSTOMER_START, {
-      page,
-      filter,
-    })
+export const setCustomerPagination = withMatcher(
+  (page: number): SetCustomerPagination =>
+    createAction(CUSTOMER_ACTION_TYPES.SET_CUSTOMER_PAGINATION, page)
+);
+
+export const resetCustomerError = withMatcher(
+  (type: CUSTOMER_ERROR_TYPES): ResetCustomerError =>
+    createAction(CUSTOMER_ACTION_TYPES.RESET_CUSTOMER_ERROR, type)
 );
 
 export const fetchAllCustomerDataStart = withMatcher(
@@ -133,7 +140,7 @@ export const fetchAllCustomerDataStart = withMatcher(
 export const fetchAllCustomerDataSuccess = withMatcher(
   (
     customers: CustomerData[],
-    pagination: Pagination
+    pagination: CustomerPagination
   ): FetchAllCustomerDataSuccess =>
     createAction(CUSTOMER_ACTION_TYPES.FETCH_ALL_CUSTOMER_DATA_SUCCESS, {
       customers,

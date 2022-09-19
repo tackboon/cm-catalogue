@@ -2,12 +2,12 @@ package main
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/tackboon97/cm-catalogue/internal/common/driver"
-	"github.com/tackboon97/cm-catalogue/internal/common/logs"
-	"github.com/tackboon97/cm-catalogue/internal/common/server"
-	"github.com/tackboon97/cm-catalogue/internal/customer/adapter"
-	"github.com/tackboon97/cm-catalogue/internal/customer/app"
-	"github.com/tackboon97/cm-catalogue/internal/customer/port"
+	"github.com/tackboon/cm-catalogue/internal/common/driver"
+	"github.com/tackboon/cm-catalogue/internal/common/logs"
+	"github.com/tackboon/cm-catalogue/internal/common/server"
+	"github.com/tackboon/cm-catalogue/internal/customer/adapter"
+	"github.com/tackboon/cm-catalogue/internal/customer/app"
+	"github.com/tackboon/cm-catalogue/internal/customer/port"
 )
 
 func main() {

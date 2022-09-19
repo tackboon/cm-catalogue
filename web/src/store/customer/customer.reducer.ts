@@ -5,7 +5,7 @@ import {
   initErrorState,
   initLoadingState,
 } from "../../utils/reducer/reducer.util";
-import { Pagination } from "../common/common.types";
+import { CustomerPagination } from "./customer.types";
 import {
   createCustomerDataFailed,
   createCustomerDataSuccess,
@@ -14,7 +14,8 @@ import {
   fetchAllCustomerDataFailed,
   fetchAllCustomerDataSuccess,
   resetCustomerError,
-  searchCustomerStart,
+  setCustomerFilter,
+  setCustomerPagination,
   setCustomerTotalUnbilledAmount,
   setIsCustomerLoading,
   setRelationshipFilter,
@@ -27,11 +28,11 @@ import {
   CUSTOMER_LOADING_TYPES,
   SELECT_CUSTOMER_RELATIONSHIP,
 } from "./customer.types";
-import { withEnumGuard } from "../../utils/common/enum_guard";
+import { withEnumGuard } from "../../utils/enum/enum_guard";
 
 export type CustomerState = {
   readonly customers: CustomerData[];
-  readonly pagination: Pagination;
+  readonly pagination: CustomerPagination;
   readonly filter: string;
   readonly relationshipFilter: SELECT_CUSTOMER_RELATIONSHIP;
   readonly isLoading: { [key: string]: boolean };
@@ -43,7 +44,7 @@ const cookieRelationshipFilter = Cookies.get("relationship_filter");
 const INITIAL_STATE: CustomerState = {
   customers: [],
   pagination: {
-    limit: 20,
+    limit: 3,
     count: 0,
     page: 1,
     total_count: 0,
@@ -72,13 +73,10 @@ export const customerReducer = (
     };
   }
 
-  if (resetCustomerError.match(action)) {
+  if (setCustomerFilter.match(action)) {
     return {
       ...state,
-      error: {
-        ...state.error,
-        [action.payload]: "",
-      },
+      filter: action.payload,
     };
   }
 
@@ -90,14 +88,23 @@ export const customerReducer = (
     };
   }
 
-  if (searchCustomerStart.match(action)) {
+  if (setCustomerPagination.match(action)) {
     return {
       ...state,
       pagination: {
         ...state.pagination,
-        page: action.payload.page,
+        page: action.payload,
       },
-      filter: action.payload.filter,
+    };
+  }
+
+  if (resetCustomerError.match(action)) {
+    return {
+      ...state,
+      error: {
+        ...state.error,
+        [action.payload]: "",
+      },
     };
   }
 

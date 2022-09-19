@@ -1,0 +1,110 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins/breakpoints";
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+
+  &.selected {
+    border: 2px solid $green-500;
+    border-radius: 1rem;
+
+    .select-preview {
+      display: none;
+    }
+  }
+
+  .image-wrapper {
+    width: 5rem;
+    flex-shrink: 0;
+  }
+
+  .image-name {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: $gray-600;
+  }
+
+  .btn {
+    display: flex;
+    flex-shrink: 0;
+
+    :global(button) {
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      border-radius: 0.2rem;
+      box-shadow: 2px 2px 4px 0 rgb(0 0 0 / 30%);
+      justify-content: center;
+      align-items: center;
+      border: none;
+
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .select-preview {
+      background-color: $yellow-500;
+      margin-right: 0.5rem;
+
+      &:hover {
+        background-color: $yellow-600;
+        color: $gray-300;
+      }
+    }
+
+    .delete {
+      background-color: $red-500;
+
+      &:hover {
+        background-color: $red-600;
+        color: $gray-300;
+      }
+    }
+  }
+}
+
+.zoom-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99;
+
+  .zoom-preview-wrapper {
+    position: relative;
+
+    .zoom-preview-close {
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.5rem;
+      position: absolute;
+      top: -2rem;
+      right: 0;
+
+      @include media-breakpoint-up(lg) {
+        right: -2rem;
+      }
+    }
+
+    :global(img) {
+      border-radius: 1rem;
+      width: 50rem;
+      max-width: 90vw;
+      max-height: 80vh;
+    }
+  }
+}

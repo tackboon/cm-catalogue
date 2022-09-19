@@ -46,7 +46,7 @@ export function createAction<T extends string, P>(type: T, payload: P) {
   return { type, payload };
 }
 
-export function initErrorState<T>(types: T) {
+export function initErrorState<T extends Object>(types: T) {
   const error = {};
 
   Object.values(types).forEach((type) => {
@@ -58,10 +58,10 @@ export function initErrorState<T>(types: T) {
   return error;
 }
 
-export function initLoadingState<T>(types: T) {
+export function initLoadingState<T extends Object>(types: T) {
   const isLoading = {};
 
-  Object.values(types).forEach((type) => {
+  Object.values(types).forEach((type: string) => {
     Object.assign(isLoading, {
       [type]: false,
     });
