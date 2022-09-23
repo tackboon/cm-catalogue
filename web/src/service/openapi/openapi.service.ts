@@ -23,6 +23,10 @@ const BASE_PATH = {
 
 const customAxios = axios.create();
 
+type APIError = {
+  slug: string;
+}
+
 customAxios.interceptors.response.use(
   (res) => res,
   (error) => {
@@ -30,8 +34,9 @@ customAxios.interceptors.response.use(
       store.dispatch(signOutStart());
     }
 
+    const apiError = (error as AxiosError).response?.data as APIError
     return Promise.reject(
-      (error as AxiosError).response ? error.response.data.slug : error.message
+      apiError && apiError.slug ? error.response.data.slug : error.message
     );
   }
 );
