@@ -18,8 +18,8 @@ func NewPostgresConnection() *pgxpool.Pool {
 		dbname=%s
 		sslmode=%s
 		pool_max_conns=%s`,
-		os.Getenv("PG_USER"),
-		os.Getenv("PG_PASSWORD"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
 		os.Getenv("PG_HOST"),
 		os.Getenv("PG_PORT"),
 		os.Getenv("PG_DBNAME"),

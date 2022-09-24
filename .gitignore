@@ -3,6 +3,7 @@
 # env file
 .env
 .env.*
+*.env
 
 # firebase
 service-account-file.json

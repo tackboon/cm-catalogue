@@ -12,7 +12,8 @@ const NavigationLayout = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
-  const brandName = process.env.REACT_APP_BRAND_NAME || "CM Catalogue";
+  const brandName =
+    process.env.REACT_APP_BRAND_NAME?.replace(/_/g, " ") || "CM Catalogue";
 
   return (
     <>
