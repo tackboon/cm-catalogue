@@ -16,10 +16,10 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v3
     - name: Build the Docker images
-      run: ./scripts/build_docker.sh ${{ github.head_ref }}.${{ github.sha }}
+      run: ./scripts/build_docker.sh ${{ github.sha }}
     - name: List docker image
       run:  docker image ls
     - name: Dockerhub login
       run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
     - name: push to Dockerhub
-      run: ./push_docker.sh ${{ github.head_ref }}.${{ github.sha }}
+      run: ./push_docker.sh ${{ github.sha }}
