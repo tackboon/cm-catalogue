@@ -197,7 +197,7 @@ func (p ProductPostgresRepository) GetAllProducts(ctx context.Context, categoryI
 	var err error
 
 	if startPosition == 0 {
-		startPositionQuery = " position > $1 AND"
+		startPositionQuery = " position >= $1 AND"
 	} else {
 		startPositionQuery = " position < $1 AND"
 	}

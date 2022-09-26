@@ -38,11 +38,16 @@ services:
     image: tackboon97/tusd:sha-e0189d1
     container_name: tusd
     hostname: tusd
-    ports:
-      - "1080:1080"
     volumes:
       - ./docker-volume/tusd/data:/srv/tusd-data/data
-    command: ["--hooks-grpc", "cm-catalogue-file-grpc:5000"]
+    command:
+      [
+        "--hooks-grpc=cm-catalogue-file-grpc:5000",
+        "--behind-proxy=true",
+        "--base-path=/uploads/files/",
+        "--expose-metrics=false",
+        "--show-greeting=false"
+      ]
     depends_on:
       - cm-catalogue-file-grpc
 

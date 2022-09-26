@@ -70,22 +70,36 @@ const useProductDragHandler = (
         const nextProduct = products[order[movingProductOrderIndex + 1]];
         const next2Product = products[order[movingProductOrderIndex + 2]];
 
-        let newPosition = 0;
+        let newPosition = movingProduct.position;
         if (prevProduct && nextProduct) {
           // if product moved to middle
           newPosition = (prevProduct.position + nextProduct.position) / 2;
-        } else if (!prevProduct) {
+        } else if (!prevProduct && nextProduct && next2Product) {
           // if product moved to first place
           newPosition = nextProduct.position;
           const nextProductNewPosition =
             (next2Product.position + newPosition) / 2;
           // update previous product new position
           dispatch(setProductPosition(nextProduct.id, nextProductNewPosition));
-        } else if (!nextProduct) {
+        } else if (!prevProduct && nextProduct) {
+          // if product moved to first place
+          // but only have 2 products in grid
+          newPosition = nextProduct.position;
+          const nextProductNewPosition = movingProduct.position;
+          // update previous product new position
+          dispatch(setProductPosition(nextProduct.id, nextProductNewPosition));
+        } else if (!nextProduct && prevProduct && prev2Product) {
           // if product moved to last place
           newPosition = prevProduct.position;
           const prevProductNewPosition =
             (prev2Product.position + newPosition) / 2;
+          // update next product new position
+          dispatch(setProductPosition(prevProduct.id, prevProductNewPosition));
+        } else if (!nextProduct && prevProduct) {
+          // if product moved to last place
+          // but only have 2 products in grid
+          newPosition = prevProduct.position;
+          const prevProductNewPosition = movingProduct.position;
           // update next product new position
           dispatch(setProductPosition(prevProduct.id, prevProductNewPosition));
         }

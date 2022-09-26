@@ -14,6 +14,7 @@ import Customer from "./pages/customer/customer.component";
 import CustomToast from "./components/custom-toast/custom_toast.component";
 import EditCategory from "./pages/edit-category/edit_category.component";
 import Product from "./pages/product/product.component";
+import NotFound from "./pages/not-found/not_found.component";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const App = () => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [dispatch]);
 
   const defaultProtectedRouteProps: Omit<ProtectedRouteProps, "outlet"> = {
     isAuthenticated: !!currentUser,
@@ -85,6 +86,7 @@ const App = () => {
               />
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
       <CustomToast />
