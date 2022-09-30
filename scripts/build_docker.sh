@@ -3,7 +3,8 @@ export $(grep -v 's/=.*//' .production.env)
 
 readonly version="$1"
 
-services=("catalogue" "catalogue-file" "customer" "user")
+services=("catalogue" "catalogue-file" "customer" "user", "mobile")
+services=("mobile")
 
 for service in ${services[@]}; do
   docker build -t "tackboon97/cm-catalogue-$service:$version" "./internal" \

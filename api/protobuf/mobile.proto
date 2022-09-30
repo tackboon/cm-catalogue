@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package mobile;
+
+option go_package = "./mobile";
+
+import "google/protobuf/empty.proto";
+
+service MobileService {
+  rpc UpdateDBVersion(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc UpdateFileVersion(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+}

@@ -15,17 +15,27 @@ type categoryRepository interface {
 	GetAllCategories(ctx context.Context) ([]catalogue.Category, error)
 }
 
-type CategoryService struct {
-	repo categoryRepository
+type mobileService interface {
+	UpdateDBVersion(ctx context.Context) error
 }
 
-func NewCategoryservice(repo categoryRepository) CategoryService {
+type CategoryService struct {
+	repo          categoryRepository
+	mobileService mobileService
+}
+
+func NewCategoryservice(repo categoryRepository, mobileService mobileService) CategoryService {
 	if repo == nil {
 		panic("missing category repository.")
 	}
 
+	if mobileService == nil {
+		panic("missing mobile service")
+	}
+
 	return CategoryService{
-		repo: repo,
+		repo:          repo,
+		mobileService: mobileService,
 	}
 }
 
@@ -37,7 +47,14 @@ func (c CategoryService) CreateNewCategory(ctx context.Context, category catalog
 		return 0, err
 	}
 
-	return c.repo.CreateNewCategory(ctx, category)
+	newID, err = c.repo.CreateNewCategory(ctx, category)
+	if err != nil {
+		return 0, err
+	}
+
+	err = c.mobileService.UpdateDBVersion(ctx)
+
+	return newID, err
 }
 
 func (c CategoryService) UpdateCategoryByID(ctx context.Context, category catalogue.Category) error {
@@ -48,11 +65,21 @@ func (c CategoryService) UpdateCategoryByID(ctx context.Context, category catalo
 		return err
 	}
 
-	return c.repo.UpdateCategoryByID(ctx, category)
+	err = c.repo.UpdateCategoryByID(ctx, category)
+	if err != nil {
+		return err
+	}
+
+	return c.mobileService.UpdateDBVersion(ctx)
 }
 
 func (c CategoryService) DeleteCategoryByID(ctx context.Context, categoryID int) error {
-	return c.repo.DeleteCategoryByID(ctx, categoryID)
+	err := c.repo.DeleteCategoryByID(ctx, categoryID)
+	if err != nil {
+		return err
+	}
+
+	return c.mobileService.UpdateDBVersion(ctx)
 }
 
 func (c CategoryService) GetCategoryByID(ctx context.Context, categoryID int) (catalogue.Category, error) {

@@ -25,7 +25,7 @@ func RunGRPCServer(registerServer func(server *grpc.Server)) {
 		logrus.Panic(err)
 	}
 
-	logrus.WithField("grpcEndpoint", grpcEndpoint).Info("Starting grpc listener")
+	logrus.WithField("grpcEndpoint", grpcEndpoint).Info("Starting GRPC listener")
 	err = grpcServer.Serve(listen)
 	if err != nil {
 		logrus.Panic(err)

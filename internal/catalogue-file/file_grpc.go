@@ -13,9 +13,14 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+type mobileService interface {
+	UpdateFileVersion(ctx context.Context) error
+}
+
 type GRPCServer struct {
-	db         *pgxpool.Pool
-	authClient auth.FirebaseAuth
+	db            *pgxpool.Pool
+	authClient    auth.FirebaseAuth
+	mobileService mobileService
 	tusdproto.UnimplementedHookServiceServer
 }
 
@@ -47,6 +52,11 @@ func (g GRPCServer) Send(ctx context.Context, req *tusdproto.SendRequest) (*tusd
 			time.Now(),
 			time.Now(),
 		)
+		if err != nil {
+			return nil, status.Error(codes.Internal, "Something went wrong.")
+		}
+
+		err = g.mobileService.UpdateFileVersion(ctx)
 		if err != nil {
 			return nil, status.Error(codes.Internal, "Something went wrong.")
 		}
