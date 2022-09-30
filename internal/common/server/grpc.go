@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -17,7 +18,9 @@ func RunGRPCServer(registerServer func(server *grpc.Server)) {
 
 	grpcEndpoint := fmt.Sprintf(":%s", port)
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(unaryInterceptor),
+	)
 	registerServer(grpcServer)
 
 	listen, err := net.Listen("tcp", grpcEndpoint)
@@ -25,9 +28,14 @@ func RunGRPCServer(registerServer func(server *grpc.Server)) {
 		logrus.Panic(err)
 	}
 
-	logrus.WithField("grpcEndpoint", grpcEndpoint).Info("Starting grpc listener")
+	logrus.WithField("grpcEndpoint", grpcEndpoint).Info("Starting GRPC listener")
 	err = grpcServer.Serve(listen)
 	if err != nil {
 		logrus.Panic(err)
 	}
+}
+
+func unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	fmt.Println(info.FullMethod)
+	return handler(ctx, req)
 }

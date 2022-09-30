@@ -5,6 +5,7 @@ import (
 	"github.com/tackboon/cm-catalogue/internal/catalogue/adapter"
 	"github.com/tackboon/cm-catalogue/internal/catalogue/app"
 	"github.com/tackboon/cm-catalogue/internal/catalogue/port"
+	"github.com/tackboon/cm-catalogue/internal/common/client"
 	"github.com/tackboon/cm-catalogue/internal/common/driver"
 	"github.com/tackboon/cm-catalogue/internal/common/logs"
 	"github.com/tackboon/cm-catalogue/internal/common/server"
@@ -16,11 +17,18 @@ func main() {
 	conn := driver.NewPostgresConnection()
 	defer conn.Close()
 
+	mobileClient, closeMobileClient, err := client.NewMobileClient()
+	if err != nil {
+		panic(err)
+	}
+	defer closeMobileClient()
+	mobileGRPC := adapter.NewMobileGRPC(mobileClient)
+
 	categoryRepository := adapter.NewCategoryPostgresRepository(conn)
-	categoryService := app.NewCategoryservice(categoryRepository)
+	categoryService := app.NewCategoryservice(categoryRepository, mobileGRPC)
 
 	productRepository := adapter.NewProductPostgresRepository(conn)
-	productService := app.NewProductService(productRepository)
+	productService := app.NewProductService(productRepository, mobileGRPC)
 
 	r := chi.NewRouter()
 	server.SetMiddlewares(r)

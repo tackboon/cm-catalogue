@@ -1,0 +1,114 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: "CM Catalogue - Mobile API"
+  description: "A service for mobile service to download data."
+servers:
+  - url: http://{hostname}/api/v1/mobile
+    variables:
+      hostname:
+        default: localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /getMobileAPIInfo:
+    get:
+      operationId: getMobileAPIInfo
+      summary: "Retrieve mobile API info"
+      tags:
+        - mobile
+      responses:
+        "200":
+          description: "Return mobile api info."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MobileAPIInfo"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /downloadDB:
+    get:
+      operationId: downloadDB
+      summary: "Get Latest DB file for mobile to launch in offline mode"
+      tags:
+        - mobile
+      responses:
+        "200":
+          description: "Return DB file."
+          content:
+            application/octet-stream:
+              schema:
+                $ref: "#/components/schemas/SchemaFile"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+  /downloadFile:
+    get:
+      operationId: downloadFile
+      summary: "Get Latest catalogue files for mobile to launch in offline mode"
+      tags:
+        - mobile
+      responses:
+        "200":
+          description: "Return a zipped file."
+          content:
+            application/zip:
+              schema:
+                $ref: "#/components/schemas/SchemaFile"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    Unexpected:
+      description: "Unexpected error."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModelError"
+
+  schemas:
+    MobileAPIInfo:
+      type: object
+      required: [dbVersion, fileVersion]
+      properties:
+        dbVersion:
+          type: integer
+          example: 1
+        fileVersion:
+          type: integer
+          example: 2
+
+    SchemaFile:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+
+    ModelError:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string

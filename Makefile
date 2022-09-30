@@ -12,6 +12,8 @@ openapi_http:
 		-package "port" "api/openapi/customer.yml" > internal/customer/port/openapi_gen.go
 	@oapi-codegen -config ./oapi_codegen_config.yml \
 		-package "port" "api/openapi/catalogue.yml" > internal/catalogue/port/openapi_gen.go
+	@oapi-codegen -config ./oapi_codegen_config.yml \
+		-package "port" "api/openapi/mobile.yml" > internal/mobile/port/openapi_gen.go
 
 .PHONY: openapi_typescript
 openapi_typescript:
@@ -34,6 +36,6 @@ openapi_typescript:
 .PHONY: proto
 proto:
 	@protoc --plugin=grpc \
-		--go_out=internal/common/genproto \
-		--go-grpc_out=internal/common/genproto \
-		--proto_path=api/protobuf cataloguefile.proto
+		--go_out=internal/common/client \
+		--go-grpc_out=internal/common/client \
+		--proto_path=api/protobuf mobile.proto

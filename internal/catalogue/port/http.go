@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
+	"github.com/sirupsen/logrus"
 	"github.com/tackboon/cm-catalogue/internal/catalogue/app"
 	catalogue "github.com/tackboon/cm-catalogue/internal/catalogue/domain"
 	"github.com/tackboon/cm-catalogue/internal/common/auth"
@@ -345,6 +346,7 @@ func (h HTTPServer) SetProductPosition(w http.ResponseWriter, r *http.Request, c
 
 	err = h.productService.SetProductPosition(r.Context(), productId, productPositionPost.Position)
 	if err != nil {
+		logrus.Debug(err)
 		httperr.RespondWithSlugError(err, w, r)
 		return
 	}

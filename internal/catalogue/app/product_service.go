@@ -18,16 +18,22 @@ type productRepository interface {
 }
 
 type ProductService struct {
-	repo productRepository
+	repo          productRepository
+	mobileService mobileService
 }
 
-func NewProductService(repo productRepository) ProductService {
+func NewProductService(repo productRepository, mobileService mobileService) ProductService {
 	if repo == nil {
 		panic("missing product repository")
 	}
 
+	if mobileService == nil {
+		panic("missing mobile service")
+	}
+
 	return ProductService{
-		repo: repo,
+		repo:          repo,
+		mobileService: mobileService,
 	}
 }
 
@@ -38,7 +44,14 @@ func (p ProductService) CreateNewProduct(ctx context.Context, product catalogue.
 		return 0, err
 	}
 
-	return p.repo.CreateNewProduct(ctx, product)
+	newID, err = p.repo.CreateNewProduct(ctx, product)
+	if err != nil {
+		return 0, err
+	}
+
+	err = p.mobileService.UpdateDBVersion(ctx)
+
+	return newID, err
 }
 
 func (p ProductService) UpdateProductByID(ctx context.Context, product catalogue.Product) error {
@@ -48,11 +61,21 @@ func (p ProductService) UpdateProductByID(ctx context.Context, product catalogue
 		return err
 	}
 
-	return p.repo.UpdateProductByID(ctx, product)
+	err = p.repo.UpdateProductByID(ctx, product)
+	if err != nil {
+		return err
+	}
+
+	return p.mobileService.UpdateDBVersion(ctx)
 }
 
 func (p ProductService) DeleteProdcutByID(ctx context.Context, productID int) error {
-	return p.repo.DeleteProdcutByID(ctx, productID)
+	err := p.repo.DeleteProdcutByID(ctx, productID)
+	if err != nil {
+		return err
+	}
+
+	return p.mobileService.UpdateDBVersion(ctx)
 }
 
 func (p ProductService) GetProductByID(ctx context.Context, productID int) (catalogue.Product, error) {
@@ -76,7 +99,12 @@ func (p ProductService) GetAllProducts(ctx context.Context, categoryID int, star
 }
 
 func (p ProductService) SetProductPosition(ctx context.Context, productID int, position float64) error {
-	return p.repo.SetProductPosition(ctx, productID, position)
+	err := p.repo.SetProductPosition(ctx, productID, position)
+	if err != nil {
+		return err
+	}
+
+	return p.mobileService.UpdateDBVersion(ctx)
 }
 
 func productPostChecking(product *catalogue.Product) (err error) {

@@ -60,3 +60,10 @@ Table cash_book {
   created_at datetime [default: `now()`]
   updated_at datetime [default: `now()`]
 }
+
+Table mobile {
+  id serial [pk, increment]
+  name varchar
+  version integer [default: 0]
+  updated_at datetime [default: 'now()']
+}
