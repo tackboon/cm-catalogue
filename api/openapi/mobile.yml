@@ -29,33 +29,22 @@ paths:
         default:
           $ref: "#/components/responses/Unexpected"
 
-  /downloadDB:
+  /download/{info_type}:
     get:
-      operationId: downloadDB
-      summary: "Get Latest DB file for mobile to launch in offline mode"
+      operationId: downloadData
+      summary: "Export file for mobile to launch in offline mode"
       tags:
         - mobile
+      parameters:
+        - in: path
+          name: info_type
+          required: true
+          schema:
+            type: string
+            enum: ["db", "file"]
       responses:
         "200":
-          description: "Return DB file."
-          content:
-            application/octet-stream:
-              schema:
-                $ref: "#/components/schemas/SchemaFile"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        default:
-          $ref: "#/components/responses/Unexpected"
-
-  /downloadFile:
-    get:
-      operationId: downloadFile
-      summary: "Get Latest catalogue files for mobile to launch in offline mode"
-      tags:
-        - mobile
-      responses:
-        "200":
-          description: "Return a zipped file."
+          description: "Return zip file."
           content:
             application/zip:
               schema:

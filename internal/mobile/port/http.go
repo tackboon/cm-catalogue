@@ -13,46 +13,39 @@ import (
 )
 
 type HttpServer struct {
-	mobileService app.MobileService
+	mobileService *app.MobileService
 }
 
-func NewHttpServer(mobileService app.MobileService) HttpServer {
+func NewHttpServer(mobileService *app.MobileService) HttpServer {
 	return HttpServer{
 		mobileService: mobileService,
 	}
 }
 
-func (h HttpServer) DownloadDB(w http.ResponseWriter, r *http.Request) {
+func (h HttpServer) DownloadData(w http.ResponseWriter, r *http.Request, infoType DownloadDataParamsInfoType) {
+	var fileName string
+	var filePath string
+	var err error
 
-}
+	if infoType == "db" {
+		fileName, filePath, err = h.mobileService.ExportDB(r.Context())
+	} else if infoType == "file" {
+		fileName, filePath, err = h.mobileService.ExportFile(r.Context())
+	} else {
+		httperr.BadRequest("invalid-type", fmt.Errorf("info type can only be either db or file"), w, r)
+		return
+	}
 
-// func (h HttpServer) GetCurrentData(w http.ResponseWriter, r *http.Request) {
-// 	file, err := os.Open("./test-file/normal.zip")
-// 	if err != nil {
-// 		logrus.Debug(err)
-// 		httperr.RespondWithSlugError(err, w, r)
-// 		return
-// 	}
-// 	defer file.Close()
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
 
-// 	fileStat, err := file.Stat()
-// 	if err != nil {
-// 		logrus.Debug(err)
-// 		httperr.RespondWithSlugError(err, w, r)
-// 		return
-// 	}
-
-// 	w.Header().Set("Content-Disposition", "attachment; filename=normal.zip")
-// 	w.Header().Set("Content-Type", "application/zip")
-// 	w.Header().Set("Content-Length", fmt.Sprint(fileStat.Size()))
-
-// 	io.Copy(w, file)
-// }
-
-func (h HttpServer) DownloadFile(w http.ResponseWriter, r *http.Request) {
-
-	fileName := "axs.zip"
-	filePath := "/srv/tusd-data/data"
+	// nothing to download
+	if filePath == "" {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -72,7 +65,6 @@ func (h HttpServer) DownloadFile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Length", fmt.Sprint(fileStat.Size()))
 
 	http.ServeContent(w, r, fileName, time.Now(), file)
-	// ZipDirectory("./test-file/axs.zip", "./test-file/normal")
 }
 
 func (h HttpServer) GetMobileAPIInfo(w http.ResponseWriter, r *http.Request) {

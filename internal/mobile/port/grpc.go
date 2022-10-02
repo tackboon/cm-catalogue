@@ -9,11 +9,11 @@ import (
 )
 
 type GRPCServer struct {
-	mobileService app.MobileService
+	mobileService *app.MobileService
 	mobile.UnimplementedMobileServiceServer
 }
 
-func NewGRPCServer(mobileService app.MobileService) GRPCServer {
+func NewGRPCServer(mobileService *app.MobileService) GRPCServer {
 	return GRPCServer{
 		mobileService: mobileService,
 	}

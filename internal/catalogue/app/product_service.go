@@ -38,7 +38,9 @@ func NewProductService(repo productRepository, mobileService mobileService) Prod
 }
 
 func (p ProductService) CreateNewProduct(ctx context.Context, product catalogue.Product) (newID int, err error) {
+	product.Name = strings.Replace(product.Name, "|", " ", -1)
 	product.Name = strings.Trim(product.Name, " ")
+	product.Description = strings.Replace(product.Description, "|", " ", -1)
 	err = productPostChecking(&product)
 	if err != nil {
 		return 0, err
@@ -55,7 +57,9 @@ func (p ProductService) CreateNewProduct(ctx context.Context, product catalogue.
 }
 
 func (p ProductService) UpdateProductByID(ctx context.Context, product catalogue.Product) error {
+	product.Name = strings.Replace(product.Name, "|", " ", -1)
 	product.Name = strings.Trim(product.Name, " ")
+	product.Description = strings.Replace(product.Description, "|", " ", -1)
 	err := productPostChecking(&product)
 	if err != nil {
 		return err

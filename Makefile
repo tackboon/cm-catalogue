@@ -39,3 +39,7 @@ proto:
 		--go_out=internal/common/client \
 		--go-grpc_out=internal/common/client \
 		--proto_path=api/protobuf mobile.proto
+
+.PHONY: siege
+siege:
+	@siege --concurrent=3 --reps=5 --delay=0 $(url)
