@@ -199,6 +199,6 @@ services:
   
 volumes:
   postgres-data:
-  db-dumb:
+  db-dump:
   nginx-log:
   file-zip:
