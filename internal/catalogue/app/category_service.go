@@ -40,6 +40,7 @@ func NewCategoryservice(repo categoryRepository, mobileService mobileService) Ca
 }
 
 func (c CategoryService) CreateNewCategory(ctx context.Context, category catalogue.Category) (newID int, err error) {
+	category.Name = strings.Replace(category.Name, "|", " ", -1)
 	category.Name = strings.Trim(category.Name, " ")
 
 	err = category.IsValidName()
@@ -58,6 +59,7 @@ func (c CategoryService) CreateNewCategory(ctx context.Context, category catalog
 }
 
 func (c CategoryService) UpdateCategoryByID(ctx context.Context, category catalogue.Category) error {
+	category.Name = strings.Replace(category.Name, "|", " ", -1)
 	category.Name = strings.Trim(category.Name, " ")
 
 	err := category.IsValidName()

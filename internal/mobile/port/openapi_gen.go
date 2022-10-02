@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -35,14 +36,14 @@ type SchemaFile struct {
 // Unexpected defines model for Unexpected.
 type Unexpected = ModelError
 
+// DownloadDataParamsInfoType defines parameters for DownloadData.
+type DownloadDataParamsInfoType string
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Get Latest DB file for mobile to launch in offline mode
-	// (GET /downloadDB)
-	DownloadDB(w http.ResponseWriter, r *http.Request)
-	// Get Latest catalogue files for mobile to launch in offline mode
-	// (GET /downloadFile)
-	DownloadFile(w http.ResponseWriter, r *http.Request)
+	// Export file for mobile to launch in offline mode
+	// (GET /download/{info_type})
+	DownloadData(w http.ResponseWriter, r *http.Request, infoType DownloadDataParamsInfoType)
 	// Retrieve mobile API info
 	// (GET /getMobileAPIInfo)
 	GetMobileAPIInfo(w http.ResponseWriter, r *http.Request)
@@ -57,31 +58,25 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.HandlerFunc) http.HandlerFunc
 
-// DownloadDB operation middleware
-func (siw *ServerInterfaceWrapper) DownloadDB(w http.ResponseWriter, r *http.Request) {
+// DownloadData operation middleware
+func (siw *ServerInterfaceWrapper) DownloadData(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "info_type" -------------
+	var infoType DownloadDataParamsInfoType
+
+	err = runtime.BindStyledParameter("simple", false, "info_type", chi.URLParam(r, "info_type"), &infoType)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "info_type", Err: err})
+		return
+	}
 
 	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DownloadDB(w, r)
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler(w, r.WithContext(ctx))
-}
-
-// DownloadFile operation middleware
-func (siw *ServerInterfaceWrapper) DownloadFile(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
-
-	var handler = func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.DownloadFile(w, r)
+		siw.Handler.DownloadData(w, r, infoType)
 	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -222,10 +217,7 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/downloadDB", wrapper.DownloadDB)
-	})
-	r.Group(func(r chi.Router) {
-		r.Get(options.BaseURL+"/downloadFile", wrapper.DownloadFile)
+		r.Get(options.BaseURL+"/download/{info_type}", wrapper.DownloadData)
 	})
 	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/getMobileAPIInfo", wrapper.GetMobileAPIInfo)

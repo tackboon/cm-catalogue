@@ -2,6 +2,8 @@ package adapter
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v4"
@@ -137,4 +139,45 @@ func mobileModelToApp(rows pgx.Rows) ([]mobile.MobileAPIVersion, error) {
 	}
 
 	return appVersions, nil
+}
+
+func (m MobilePostgresRepository) ExportTable(ctx context.Context, dirPath string) error {
+	paths := []string{
+		fmt.Sprintf("%s/%s", dirPath, "categories.txt"),
+		fmt.Sprintf("%s/%s", dirPath, "products.txt"),
+		fmt.Sprintf("%s/%s", dirPath, "catalogue_files.txt"),
+		fmt.Sprintf("%s/%s", dirPath, "products_catalogue_files.txt"),
+	}
+
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		err = os.Mkdir(dirPath, 0755)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, path := range paths {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			f, err := os.Create(path)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+
+			err = os.Chmod(path, 0666)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	stmt := fmt.Sprintf(`
+		COPY categories TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
+		COPY products TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
+		COPY catalogue_files TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
+		COPY products_catalogue_files TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
+	`, paths[0], paths[1], paths[2], paths[3])
+
+	_, err := m.db.Exec(ctx, stmt)
+	return err
 }

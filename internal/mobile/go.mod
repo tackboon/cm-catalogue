@@ -5,6 +5,7 @@ go 1.19
 replace github.com/tackboon/cm-catalogue/internal/common => ../common/
 
 require (
+	github.com/deepmap/oapi-codegen v1.11.0
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/render v1.0.2
 	github.com/golang/protobuf v1.5.2
