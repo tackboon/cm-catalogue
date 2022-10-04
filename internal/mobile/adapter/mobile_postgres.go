@@ -143,10 +143,10 @@ func mobileModelToApp(rows pgx.Rows) ([]mobile.MobileAPIVersion, error) {
 
 func (m MobilePostgresRepository) ExportTable(ctx context.Context, dirPath string) error {
 	paths := []string{
-		fmt.Sprintf("%s/%s", dirPath, "categories.txt"),
-		fmt.Sprintf("%s/%s", dirPath, "products.txt"),
-		fmt.Sprintf("%s/%s", dirPath, "catalogue_files.txt"),
-		fmt.Sprintf("%s/%s", dirPath, "products_catalogue_files.txt"),
+		fmt.Sprintf("%s/%s", dirPath, "categories"),
+		fmt.Sprintf("%s/%s", dirPath, "products"),
+		fmt.Sprintf("%s/%s", dirPath, "catalogue_files"),
+		fmt.Sprintf("%s/%s", dirPath, "products_catalogue_files"),
 	}
 
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
@@ -173,9 +173,11 @@ func (m MobilePostgresRepository) ExportTable(ctx context.Context, dirPath strin
 
 	stmt := fmt.Sprintf(`
 		COPY categories TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
-		COPY products TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
+		COPY products (id, category_id, name, description, price, status, 
+			position, created_at, updated_at) 
+			TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
 		COPY catalogue_files TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
-		COPY products_catalogue_files TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
+		COPY products_catalogue_files	TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
 	`, paths[0], paths[1], paths[2], paths[3])
 
 	_, err := m.db.Exec(ctx, stmt)
