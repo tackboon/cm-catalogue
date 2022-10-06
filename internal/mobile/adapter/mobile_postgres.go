@@ -145,7 +145,6 @@ func (m MobilePostgresRepository) ExportTable(ctx context.Context, dirPath strin
 	paths := []string{
 		fmt.Sprintf("%s/%s", dirPath, "categories"),
 		fmt.Sprintf("%s/%s", dirPath, "products"),
-		fmt.Sprintf("%s/%s", dirPath, "catalogue_files"),
 		fmt.Sprintf("%s/%s", dirPath, "products_catalogue_files"),
 	}
 
@@ -176,9 +175,8 @@ func (m MobilePostgresRepository) ExportTable(ctx context.Context, dirPath strin
 		COPY products (id, category_id, name, description, price, status, 
 			position, created_at, updated_at) 
 			TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
-		COPY catalogue_files TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
 		COPY products_catalogue_files	TO '%s' WITH ( FORMAT 'text', DELIMITER '|' );
-	`, paths[0], paths[1], paths[2], paths[3])
+	`, paths[0], paths[1], paths[2])
 
 	_, err := m.db.Exec(ctx, stmt)
 	return err
