@@ -62,13 +62,13 @@ export function* addTusUpload({ payload }: AddUpload) {
     })
   );
 
-  const prevUploads = yield* call([tusUpload, tusUpload.findPreviousUploads]);
-  if (prevUploads.length > 0) {
-    yield* call(
-      [tusUpload, tusUpload.resumeFromPreviousUpload],
-      prevUploads[0]
-    );
-  }
+  // const prevUploads = yield* call([tusUpload, tusUpload.findPreviousUploads]);
+  // if (prevUploads.length > 0) {
+  //   yield* call(
+  //     [tusUpload, tusUpload.resumeFromPreviousUpload],
+  //     prevUploads[0]
+  //   );
+  // }
   yield* call([tusUpload, tusUpload.start]);
 }
 

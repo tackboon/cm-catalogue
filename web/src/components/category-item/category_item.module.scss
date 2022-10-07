@@ -23,7 +23,7 @@
   :global(img) {
     width: 100%;
     height: 12.5rem;
-    object-fit: cover;
+    object-fit: contain;
   }
 
   .category-item-description {
