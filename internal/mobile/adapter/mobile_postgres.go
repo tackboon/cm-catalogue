@@ -141,7 +141,7 @@ func mobileModelToApp(rows pgx.Rows) ([]mobile.MobileAPIVersion, error) {
 	return appVersions, nil
 }
 
-func (m MobilePostgresRepository) ExportTable(ctx context.Context, dirPath string) error {
+func (m MobilePostgresRepository) ExportDB(ctx context.Context, dirPath string) error {
 	paths := []string{
 		fmt.Sprintf("%s/%s", dirPath, "categories"),
 		fmt.Sprintf("%s/%s", dirPath, "products"),

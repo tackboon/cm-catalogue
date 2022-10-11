@@ -8,9 +8,8 @@ const (
 )
 
 const (
-	BackUpPath      string = "/db-dump"
-	FileDataPath    string = "/file-data"
-	ZipFileDataPath string = "/file-zip"
+	BackUpPath   string = "/db-dump"
+	FileDataPath string = "/file-data"
 )
 
 type MobileAPIVersion struct {

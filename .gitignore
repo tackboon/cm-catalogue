@@ -40,4 +40,4 @@ service-account-file.json
 *.code-workspace
 
 # tmp file
-internal/*/tmp-file/*
+internal/common/file/tmp/*

@@ -14,7 +14,7 @@ type mobileRepository interface {
 	GetMobileAPIVersion(ctx context.Context) ([]mobile.MobileAPIVersion, error)
 	UpdateDBVersion(ctx context.Context) error
 	UpdateFileVersion(ctx context.Context) error
-	ExportTable(ctx context.Context, dirPath string) error
+	ExportDB(ctx context.Context, dirPath string) error
 }
 
 type MobileService struct {
@@ -55,96 +55,38 @@ func (m *MobileService) UpdateFileVersion(ctx context.Context) error {
 	return m.repo.UpdateFileVersion(ctx)
 }
 
-func (m *MobileService) ExportDB(ctx context.Context) (fileName, filePath string, err error) {
+func (m *MobileService) ExportDB(ctx context.Context) (dirPath string, err error) {
 	versionMap, err := m.GetMobileAPIVersion(ctx)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
 
-	var dirPath string
 	if v, ok := versionMap[string(mobile.DBVersion)]; ok {
 		dirPath = fmt.Sprintf("%s/db_data_%d", mobile.BackUpPath, v)
-		fileName = fmt.Sprintf("db_data_%d.zip", v)
-		filePath = fmt.Sprintf("%s/%s", mobile.BackUpPath, fileName)
 	} else {
 		// the db has not update yet
-		return "", "", nil
+		return "", nil
 	}
 
 	// make sure export process are not repeated
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if _, err = os.Stat(filePath); err == nil {
-		return
+	if _, err = os.Stat(dirPath); err == nil {
+		return dirPath, nil
 	} else if os.IsNotExist(err) {
 		// Remove all old files
 		err = file.RemoveContents(mobile.BackUpPath)
 		if err != nil {
-			return "", "", err
+			return "", err
 		}
 
-		// Export Table to directory
-		err = m.repo.ExportTable(ctx, dirPath)
+		// Export DB to directory
+		err = m.repo.ExportDB(ctx, dirPath)
 		if err != nil {
-			return "", "", err
-		}
-
-		// Zip directory
-		f, err := os.Create(filePath)
-		if err != nil {
-			return "", "", err
-		}
-		defer f.Close()
-
-		err = file.ZipDirectory(filePath, dirPath)
-		if err != nil {
-			return "", "", err
+			return "", err
 		}
 	}
 
-	return fileName, filePath, nil
-}
-
-func (m *MobileService) ExportFile(ctx context.Context) (fileName, filePath string, err error) {
-	versionMap, err := m.GetMobileAPIVersion(ctx)
-	if err != nil {
-		return "", "", err
-	}
-
-	if v, ok := versionMap[string(mobile.FileVersion)]; ok {
-		fileName = fmt.Sprintf("file_data_%d.zip", v)
-		filePath = fmt.Sprintf("%s/%s", mobile.ZipFileDataPath, fileName)
-	} else {
-		// the file data has not update yet
-		return "", "", nil
-	}
-
-	// make sure export process are not repeated
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, err = os.Stat(filePath); err == nil {
-		return
-	} else if os.IsNotExist(err) {
-		// Remove all old files
-		err = file.RemoveContents(mobile.ZipFileDataPath)
-		if err != nil {
-			return "", "", err
-		}
-
-		// Zip directory
-		f, err := os.Create(filePath)
-		if err != nil {
-			return "", "", err
-		}
-		defer f.Close()
-
-		err = file.ZipDirectory(filePath, mobile.FileDataPath)
-		if err != nil {
-			return "", "", err
-		}
-	}
-
-	return fileName, filePath, nil
+	return dirPath, nil
 }

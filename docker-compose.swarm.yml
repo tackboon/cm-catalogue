@@ -166,7 +166,6 @@ services:
       - ./service-account-file.json:${SERVICE_ACCOUNT_FILE}
       - db-dump:/db-dump
       - ./docker-volume/tusd/data:/file-data
-      - file-zip:/file-zip
     env_file:
       - .production.env
     environment:
@@ -200,4 +199,3 @@ services:
 volumes:
   postgres-data:
   db-dump:
-  file-zip:

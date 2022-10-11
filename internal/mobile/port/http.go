@@ -3,10 +3,9 @@ package port
 import (
 	"fmt"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/go-chi/render"
+	"github.com/tackboon/cm-catalogue/internal/common/file"
 	"github.com/tackboon/cm-catalogue/internal/common/server/httperr"
 	"github.com/tackboon/cm-catalogue/internal/mobile/app"
 	mobile "github.com/tackboon/cm-catalogue/internal/mobile/domain"
@@ -24,47 +23,39 @@ func NewHttpServer(mobileService *app.MobileService) HttpServer {
 
 func (h HttpServer) DownloadData(w http.ResponseWriter, r *http.Request, infoType DownloadDataParamsInfoType) {
 	var fileName string
-	var filePath string
+	var src string
 	var err error
 
 	if infoType == "db" {
-		fileName, filePath, err = h.mobileService.ExportDB(r.Context())
+		fileName = "db-data.zip"
+		src, err = h.mobileService.ExportDB(r.Context())
+		if err != nil {
+			httperr.BadRequest("invalid-type", fmt.Errorf("info type can only be either db or file"), w, r)
+			return
+		}
 	} else if infoType == "file" {
-		fileName, filePath, err = h.mobileService.ExportFile(r.Context())
+		fileName = "file-data.zip"
+		src = mobile.FileDataPath
 	} else {
 		httperr.BadRequest("invalid-type", fmt.Errorf("info type can only be either db or file"), w, r)
 		return
 	}
 
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
-
-	// nothing to download
-	if filePath == "" {
+	if src == "" {
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
-	file, err := os.Open(filePath)
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
-	defer file.Close()
-
-	fileStat, err := file.Stat()
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
-
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	// Stream Zip and Download to minimize memory use
 	w.Header().Set("Content-Type", "application/zip")
-	w.Header().Set("Content-Length", fmt.Sprint(fileStat.Size()))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", fileName))
+	w.Header().Del("Content-Length")
 
-	http.ServeContent(w, r, fileName, time.Now(), file)
+	err = file.Zip(src, w)
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
 }
 
 func (h HttpServer) GetMobileAPIInfo(w http.ResponseWriter, r *http.Request) {

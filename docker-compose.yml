@@ -212,7 +212,6 @@ services:
       - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
       - ./docker-volume/db-dump:/db-dump
       - ./docker-volume/tusd/data:/file-data
-      - ./docker-volume/file-zip:/file-zip
     working_dir: /internal/mobile
     env_file:
       - .env
