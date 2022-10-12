@@ -14,6 +14,9 @@ openapi_http:
 		-package "port" "api/openapi/catalogue.yml" > internal/catalogue/port/openapi_gen.go
 	@oapi-codegen -config ./oapi_codegen_config.yml \
 		-package "port" "api/openapi/mobile.yml" > internal/mobile/port/openapi_gen.go
+	@oapi-codegen -config ./oapi_codegen_config.yml \
+		-package "main" "api/openapi/catalogue-file.yml" > internal/catalogue-file/openapi_gen.go
+
 
 .PHONY: openapi_typescript
 openapi_typescript:

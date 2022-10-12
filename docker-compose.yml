@@ -160,6 +160,27 @@ services:
       - cm-mobile-grpc
 
   ################################################################
+  # Application service - catalogue-file (HTTP Protocol)
+  ################################################################
+  cm-catalogue-file-http:
+    build:
+      context: docker/app
+    container_name: cm-catalogue-file-http
+    hostname: cm-catalogue-file-http
+    volumes:
+      - ./internal:/internal
+      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
+      - ./docker-volume/tusd/data:/file-data
+    working_dir: /internal/catalogue-file
+    env_file:
+      - .env
+    environment:
+      - "PORT=5000"
+      - "SERVER_TO_RUN=http"
+    depends_on:
+      - postgres
+
+  ################################################################
   # Application service - catalogue-file (GRPC Protocol)
   ################################################################
   cm-catalogue-file-grpc:
@@ -171,31 +192,11 @@ services:
       - ./internal:/internal
       - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
     working_dir: /internal/catalogue-file
-    ports:
-      - "5000:5000"
     env_file:
       - .env
     environment:
       - "PORT=5000"
-    depends_on:
-      - postgres
-
-  ################################################################
-  # Application service - mobile (HTTP Protocol)
-  ################################################################
-  cm-catalogue-http:
-    build:
-      context: docker/app
-    container_name: cm-catalogue-http
-    hostname: cm-catalogue-http
-    volumes:
-      - ./internal:/internal
-      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
-    working_dir: /internal/catalogue
-    env_file:
-      - .env
-    environment:
-      - "PORT=5000"
+      - "SERVER_TO_RUN=grpc"
     depends_on:
       - postgres
 

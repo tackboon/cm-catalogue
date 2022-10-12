@@ -1,6 +1,10 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
+	"github.com/go-chi/chi/v5"
 	"github.com/tackboon/cm-catalogue/internal/common/auth"
 	"github.com/tackboon/cm-catalogue/internal/common/client"
 	"github.com/tackboon/cm-catalogue/internal/common/driver"
@@ -26,8 +30,21 @@ func main() {
 	defer closeMobileClient()
 	mobileGRPC := NewMobileGRPC(mobileClient)
 
-	server.RunGRPCServer(func(server *grpc.Server) {
-		svc := GRPCServer{db: conn, authClient: authClient, mobileService: mobileGRPC}
-		tusdproto.RegisterHookServiceServer(server, svc)
-	})
+	httpServer := NewHttpserver(conn)
+
+	serverType := os.Getenv("SERVER_TO_RUN")
+	switch serverType {
+	case "http":
+		r := chi.NewRouter()
+		server.SetMiddlewares(r)
+		HandlerFromMuxWithBaseURL(httpServer, r, "/api/v1/catalogue-file")
+		server.RunHTTPServer(r)
+	case "grpc":
+		server.RunGRPCServer(func(server *grpc.Server) {
+			svc := GRPCServer{db: conn, authClient: authClient, mobileService: mobileGRPC}
+			tusdproto.RegisterHookServiceServer(server, svc)
+		})
+	default:
+		panic(fmt.Sprintf("server type '%s' is not supported", serverType))
+	}
 }

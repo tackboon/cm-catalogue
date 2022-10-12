@@ -5,8 +5,11 @@ go 1.18
 replace github.com/tackboon/cm-catalogue/internal/common => ../common/
 
 require (
+	github.com/go-chi/chi/v5 v5.0.7
 	github.com/golang/protobuf v1.5.2
 	github.com/jackc/pgx/v4 v4.17.0
+	github.com/lib/pq v1.10.2
+	github.com/sirupsen/logrus v1.9.0
 	github.com/tackboon/cm-catalogue/internal/common v0.0.0-00010101000000-000000000000
 	github.com/tackboon/tusd v0.0.0-20220823141951-07fba1a6f842
 	google.golang.org/grpc v1.48.0
@@ -20,7 +23,6 @@ require (
 	cloud.google.com/go/storage v1.25.0 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/ajg/form v1.5.1 // indirect
-	github.com/go-chi/chi/v5 v5.0.7 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-chi/render v1.0.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -37,7 +39,6 @@ require (
 	github.com/jackc/pgtype v1.12.0 // indirect
 	github.com/jackc/puddle v1.2.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/net v0.0.0-20220822230855-b0a4917ee28c // indirect

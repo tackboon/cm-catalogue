@@ -1,0 +1,59 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: "CM Catalogue - Catalogue File API"
+  description: "A service for managing catalogue file."
+servers:
+  - url: http://{hostname}/api/v1/catalogue-file
+    variables:
+      hostname:
+        default: localhost:8080
+security:
+  - bearerAuth: []
+paths:
+  /deleteTemporaryFiles:
+    delete:
+      operationId: deleteTemporaryFiles
+      summary: "Clean up unused files"
+      tags:
+        - catalogue-file
+      responses:
+        "204":
+          description: "Delete successful."
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/ForbiddenError"
+        default:
+          $ref: "#/components/responses/Unexpected"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    ForbiddenError:
+      description: Forbidden action
+    Unexpected:
+      description: "Unexpected error."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModelError"
+
+  schemas:
+    ModelError:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string

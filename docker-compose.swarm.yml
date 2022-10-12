@@ -138,6 +138,27 @@ services:
         condition: on-failure
 
   ################################################################
+  # Application service - catalogue-file (HTTP Protocol)
+  ################################################################
+  cm-catalogue-file-http:
+    image: tackboon97/cm-catalogue-catalogue-file
+    hostname: cm-catalogue-file-http
+    volumes:
+      - ./service-account-file.json:$SERVICE_ACCOUNT_FILE
+      - ./docker-volume/tusd/data:/file-data
+    env_file:
+      - .production.env
+    environment:
+      - "PORT=5000"
+      - "SERVER_TO_RUN=http"
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels: [APP=CATALOGUE_FILE_HTTP_API]
+      restart_policy:
+        condition: on-failure
+
+  ################################################################
   # Application service - catalogue-file (GRPC Protocol)
   ################################################################
   cm-catalogue-file-grpc:
@@ -149,6 +170,7 @@ services:
       - .production.env
     environment:
       - "PORT=5000"
+      - "SERVER_TO_RUN=grpc"
     deploy:
       mode: replicated
       replicas: 1
