@@ -92,7 +92,7 @@ func (p ProductPostgresRepository) CreateNewProduct(ctx context.Context, product
 	return newID, nil
 }
 
-func (p ProductPostgresRepository) UpdateProductByID(ctx context.Context, product catalogue.Product) error {
+func (p ProductPostgresRepository) UpdateProductByID(ctx context.Context, product catalogue.Product, changeCategory bool) error {
 	tx, err := p.db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return err
@@ -105,12 +105,8 @@ func (p ProductPostgresRepository) UpdateProductByID(ctx context.Context, produc
 		}
 	}()
 
-	productStmt := `
-		UPDATE products SET name=$2, description=$3, price=$4, status=$5, updated_at=$6
-		WHERE id=$1;
-	`
-
-	_, err = tx.Exec(ctx, productStmt,
+	var productArgs []interface{}
+	productArgs = append(productArgs,
 		product.ID,
 		product.Name,
 		product.Description,
@@ -118,6 +114,19 @@ func (p ProductPostgresRepository) UpdateProductByID(ctx context.Context, produc
 		product.Status,
 		time.Now(),
 	)
+
+	changeCategoryStmt := ""
+	if changeCategory {
+		changeCategoryStmt = ", category_id=$7, position=nextval('products_position_seq')"
+		productArgs = append(productArgs, product.CategoryID)
+	}
+
+	productStmt := `
+		UPDATE products SET name=$2, description=$3, price=$4, status=$5, updated_at=$6` + changeCategoryStmt + `
+		WHERE id=$1;
+	`
+
+	_, err = tx.Exec(ctx, productStmt, productArgs...)
 
 	if err != nil {
 		var pgerr *pgconn.PgError

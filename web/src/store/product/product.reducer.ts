@@ -154,13 +154,15 @@ export const productReducer = (
   if (updateProductSuccess.match(action)) {
     return {
       ...state,
-      products: state.products.map((p) => {
-        if (p.id === action.payload.id) {
-          return action.payload;
-        } else {
-          return p;
-        }
-      }),
+      products: action.payload.changeCategory
+        ? state.products.filter((p) => p.id !== action.payload.product.id)
+        : state.products.map((p) => {
+            if (p.id === action.payload.product.id) {
+              return action.payload.product;
+            } else {
+              return p;
+            }
+          }),
       isLoading: {
         ...state.isLoading,
         [PRODUCT_LOADING_TYPE.UPDATE_PRODUCT]: false,

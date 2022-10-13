@@ -142,7 +142,6 @@ const ProductForm: FC<ProductFormProps> = ({
         <Form.Select
           {...register("categoryID")}
           defaultValue={categoryID}
-          disabled={!!initData}
         >
           {categories.map((category) => (
             <option value={category.id} key={category.id}>

@@ -134,7 +134,8 @@ export function* updateProduct({ payload }: UpdateProductStart) {
       [api.ProductAPI, api.ProductAPI.updateProduct],
       currentPageCategoryID,
       payload.productID,
-      payload.product
+      payload.product,
+      payload.categoryID
     );
 
     const product = {
@@ -144,7 +145,13 @@ export function* updateProduct({ payload }: UpdateProductStart) {
           ? PRODUCT_STATUS_TYPE.IN_STOCK
           : PRODUCT_STATUS_TYPE.OUT_OF_STOCK,
     };
-    yield* put(updateProductSuccess(product));
+
+    yield* put(
+      updateProductSuccess(
+        product,
+        currentPageCategoryID !== +payload.categoryID
+      )
+    );
   } catch (err) {
     yield* put(updateProductFailed(err as string));
   }

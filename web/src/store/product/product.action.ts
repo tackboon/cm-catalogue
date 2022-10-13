@@ -70,7 +70,7 @@ export type UpdateProductStart = ActionWithPayload<
 
 export type UpdateProductSuccess = ActionWithPayload<
   PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS,
-  ProductData
+  { product: ProductData; changeCategory: boolean }
 >;
 
 export type UpdateProductFailed = ActionWithPayload<
@@ -190,8 +190,11 @@ export const updateProductStart = withMatcher(
 );
 
 export const updateProductSuccess = withMatcher(
-  (product: ProductData): UpdateProductSuccess =>
-    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS, product)
+  (product: ProductData, changeCategory: boolean): UpdateProductSuccess =>
+    createAction(PRODUCT_ACTION_TYPES.UPDATE_PRODUCT_SUCCESS, {
+      product,
+      changeCategory,
+    })
 );
 
 export const updateProductFailed = withMatcher(

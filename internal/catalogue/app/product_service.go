@@ -10,7 +10,7 @@ import (
 
 type productRepository interface {
 	CreateNewProduct(ctx context.Context, product catalogue.Product) (newID int, err error)
-	UpdateProductByID(ctx context.Context, product catalogue.Product) error
+	UpdateProductByID(ctx context.Context, product catalogue.Product, changeCategory bool) error
 	DeleteProdcutByID(ctx context.Context, productID int) error
 	GetProductByID(ctx context.Context, productID int) (catalogue.Product, error)
 	GetAllProducts(ctx context.Context, categoryID int, startPosition float64, limit int, filter string, statusFilter catalogue.StatusFilter) ([]catalogue.Product, error)
@@ -56,7 +56,7 @@ func (p ProductService) CreateNewProduct(ctx context.Context, product catalogue.
 	return newID, err
 }
 
-func (p ProductService) UpdateProductByID(ctx context.Context, product catalogue.Product) error {
+func (p ProductService) UpdateProductByID(ctx context.Context, product catalogue.Product, changeCategory bool) error {
 	product.Name = strings.Replace(product.Name, "|", " ", -1)
 	product.Name = strings.Trim(product.Name, " ")
 	product.Description = strings.Replace(product.Description, "|", " ", -1)
@@ -65,7 +65,7 @@ func (p ProductService) UpdateProductByID(ctx context.Context, product catalogue
 		return err
 	}
 
-	err = p.repo.UpdateProductByID(ctx, product)
+	err = p.repo.UpdateProductByID(ctx, product, changeCategory)
 	if err != nil {
 		return err
 	}

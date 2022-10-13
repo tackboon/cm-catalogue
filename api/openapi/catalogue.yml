@@ -243,6 +243,11 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: new_category_id
+          schema:
+            type: integer
+            example: 1
         - in: path
           name: product_id
           required: true

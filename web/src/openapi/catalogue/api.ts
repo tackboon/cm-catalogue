@@ -873,10 +873,11 @@ export const ProductsApiAxiosParamCreator = function (configuration?: Configurat
          * @param {number} categoryId 
          * @param {number} productId 
          * @param {ProductPost} productPost 
+         * @param {number} [newCategoryId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateProduct: async (categoryId: number, productId: number, productPost: ProductPost, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateProduct: async (categoryId: number, productId: number, productPost: ProductPost, newCategoryId?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'categoryId' is not null or undefined
             assertParamExists('updateProduct', 'categoryId', categoryId)
             // verify required parameter 'productId' is not null or undefined
@@ -900,6 +901,10 @@ export const ProductsApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (newCategoryId !== undefined) {
+                localVarQueryParameter['new_category_id'] = newCategoryId;
+            }
 
 
     
@@ -995,11 +1000,12 @@ export const ProductsApiFp = function(configuration?: Configuration) {
          * @param {number} categoryId 
          * @param {number} productId 
          * @param {ProductPost} productPost 
+         * @param {number} [newCategoryId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateProduct(categoryId: number, productId: number, productPost: ProductPost, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Product>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProduct(categoryId, productId, productPost, options);
+        async updateProduct(categoryId: number, productId: number, productPost: ProductPost, newCategoryId?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Product>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProduct(categoryId, productId, productPost, newCategoryId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -1077,11 +1083,12 @@ export const ProductsApiFactory = function (configuration?: Configuration, baseP
          * @param {number} categoryId 
          * @param {number} productId 
          * @param {ProductPost} productPost 
+         * @param {number} [newCategoryId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateProduct(categoryId: number, productId: number, productPost: ProductPost, options?: any): AxiosPromise<Product> {
-            return localVarFp.updateProduct(categoryId, productId, productPost, options).then((request) => request(axios, basePath));
+        updateProduct(categoryId: number, productId: number, productPost: ProductPost, newCategoryId?: number, options?: any): AxiosPromise<Product> {
+            return localVarFp.updateProduct(categoryId, productId, productPost, newCategoryId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1168,12 +1175,13 @@ export class ProductsApi extends BaseAPI {
      * @param {number} categoryId 
      * @param {number} productId 
      * @param {ProductPost} productPost 
+     * @param {number} [newCategoryId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProductsApi
      */
-    public updateProduct(categoryId: number, productId: number, productPost: ProductPost, options?: AxiosRequestConfig) {
-        return ProductsApiFp(this.configuration).updateProduct(categoryId, productId, productPost, options).then((request) => request(this.axios, this.basePath));
+    public updateProduct(categoryId: number, productId: number, productPost: ProductPost, newCategoryId?: number, options?: AxiosRequestConfig) {
+        return ProductsApiFp(this.configuration).updateProduct(categoryId, productId, productPost, newCategoryId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -192,7 +192,7 @@ func (h HTTPServer) CreateProduct(w http.ResponseWriter, r *http.Request, catego
 	h.GetProductByID(w, r, categoryId, newID)
 }
 
-func (h HTTPServer) UpdateProduct(w http.ResponseWriter, r *http.Request, categoryId int, productId int) {
+func (h HTTPServer) UpdateProduct(w http.ResponseWriter, r *http.Request, categoryId int, productId int, params UpdateProductParams) {
 	user, err := auth.UserFromCtx(r.Context())
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
@@ -217,9 +217,18 @@ func (h HTTPServer) UpdateProduct(w http.ResponseWriter, r *http.Request, catego
 		productStatusType = catalogue.OutOfStock
 	}
 
+	cID := categoryId
+	changeCategory := false
+	if params.NewCategoryId != nil {
+		cID = *params.NewCategoryId
+		if cID != categoryId {
+			changeCategory = true
+		}
+	}
+
 	product := catalogue.Product{
 		ID:          productId,
-		CategoryID:  categoryId,
+		CategoryID:  cID,
 		Name:        productPost.Name,
 		Description: productPost.Description,
 		Price:       productPost.Price,
@@ -234,7 +243,7 @@ func (h HTTPServer) UpdateProduct(w http.ResponseWriter, r *http.Request, catego
 		product.PreviewID = *productPost.PreviewId
 	}
 
-	err = h.productService.UpdateProductByID(r.Context(), product)
+	err = h.productService.UpdateProductByID(r.Context(), product, changeCategory)
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
 		return

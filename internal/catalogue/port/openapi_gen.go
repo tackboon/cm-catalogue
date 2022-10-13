@@ -104,6 +104,11 @@ type CreateProductJSONBody = ProductPost
 // UpdateProductJSONBody defines parameters for UpdateProduct.
 type UpdateProductJSONBody = ProductPost
 
+// UpdateProductParams defines parameters for UpdateProduct.
+type UpdateProductParams struct {
+	NewCategoryId *int `form:"new_category_id,omitempty" json:"new_category_id,omitempty"`
+}
+
 // SetProductPositionJSONBody defines parameters for SetProductPosition.
 type SetProductPositionJSONBody struct {
 	Position *int `json:"position,omitempty"`
@@ -155,7 +160,7 @@ type ServerInterface interface {
 	GetProductByID(w http.ResponseWriter, r *http.Request, categoryId int, productId int)
 	// Update product by ID
 	// (PUT /categories/{category_id}/products/{product_id})
-	UpdateProduct(w http.ResponseWriter, r *http.Request, categoryId int, productId int)
+	UpdateProduct(w http.ResponseWriter, r *http.Request, categoryId int, productId int, params UpdateProductParams)
 	// Set product position
 	// (PUT /categories/{category_id}/products/{product_id}/set-position)
 	SetProductPosition(w http.ResponseWriter, r *http.Request, categoryId int, productId int)
@@ -491,8 +496,22 @@ func (siw *ServerInterfaceWrapper) UpdateProduct(w http.ResponseWriter, r *http.
 
 	ctx = context.WithValue(ctx, BearerAuthScopes, []string{""})
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateProductParams
+
+	// ------------- Optional query parameter "new_category_id" -------------
+	if paramValue := r.URL.Query().Get("new_category_id"); paramValue != "" {
+
+	}
+
+	err = runtime.BindQueryParameter("form", true, false, "new_category_id", r.URL.Query(), &params.NewCategoryId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "new_category_id", Err: err})
+		return
+	}
+
 	var handler = func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.UpdateProduct(w, r, categoryId, productId)
+		siw.Handler.UpdateProduct(w, r, categoryId, productId, params)
 	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
