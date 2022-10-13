@@ -49,4 +49,5 @@
 .content-wrapper {
   overflow: auto;
   height: calc(100vh - 76px);
+  scroll-behavior: smooth;
 }

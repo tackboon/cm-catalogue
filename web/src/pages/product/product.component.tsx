@@ -3,6 +3,7 @@ import { Button, Card, Container, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { GridContainer, BlockWrapper } from "@tackboon/react-grid-rearrange";
+import { BsFillShiftFill } from "react-icons/bs";
 
 import {
   resetProductFilter,
@@ -62,6 +63,14 @@ const Product = () => {
     };
   }, [dispatch]);
 
+  // handle scroll to top
+  const handleScrollTop = () => {
+    const pageEl = document.getElementById("content-wrapper") as HTMLDivElement;
+    if (pageEl) {
+      pageEl.scrollTo(0, 0);
+    }
+  };
+
   return (
     <>
       <Container>
@@ -111,6 +120,10 @@ const Product = () => {
             >
               Add Product
             </Button>
+          </div>
+
+          <div className={styles["scroll-top"]} onClick={handleScrollTop}>
+            <BsFillShiftFill className={styles["scroll-icon"]} />
           </div>
 
           {products.length === 0 ? (
