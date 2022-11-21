@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/tackboon/cm-catalogue/internal/common/client/mobile"
 	"github.com/tackboon/cm-catalogue/internal/common/driver"
+	"github.com/tackboon/cm-catalogue/internal/common/genproto/mobile"
 	"github.com/tackboon/cm-catalogue/internal/common/logs"
 	"github.com/tackboon/cm-catalogue/internal/common/server"
 	"github.com/tackboon/cm-catalogue/internal/mobile/adapter"

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/tackboon/cm-catalogue/internal/common/client/mobile"
+	"github.com/tackboon/cm-catalogue/internal/common/genproto/mobile"
 )
 
 type MobileGRPC struct {

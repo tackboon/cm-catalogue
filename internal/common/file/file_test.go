@@ -10,6 +10,8 @@ import (
 )
 
 func TestRemoveContents(t *testing.T) {
+	t.Parallel()
+
 	// create directory
 	dirPath := "test-dir"
 	err := os.MkdirAll(dirPath, 0777)
@@ -44,6 +46,9 @@ func TestRemoveContents(t *testing.T) {
 }
 
 func TestZip(t *testing.T) {
+	t.Skip("Skipping zip test")
+	t.Parallel()
+
 	defer profile.Start(profile.MemProfile, profile.ProfilePath("tmp")).Stop()
 
 	dstPath := "tmp/file-data.zip"

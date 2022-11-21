@@ -16,6 +16,8 @@ service-account-file.json
 #######################################################
 /internal/*/tmp
 /internal/*/test
+/internal/*/*_cover
+/internal/*/*_cover.html
 
 #######################################################
 # web

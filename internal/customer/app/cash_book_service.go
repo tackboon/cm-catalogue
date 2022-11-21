@@ -7,17 +7,11 @@ import (
 	customer "github.com/tackboon/cm-catalogue/internal/customer/domain"
 )
 
-type cashbookRepository interface {
-	CreateCashBookRecord(ctx context.Context, cashbook customer.CashBookRecord) error
-	DeleteCashBookRecordByID(ctx context.Context, cashBookID int) error
-	GetCashBookRecords(ctx context.Context, customerID int, startAt time.Time, endAt time.Time) ([]customer.CashBookRecord, error)
-}
-
 type CashBookService struct {
-	repo cashbookRepository
+	repo customer.CashbookRepository
 }
 
-func NewCashBookService(repo cashbookRepository) CashBookService {
+func NewCashBookService(repo customer.CashbookRepository) CashBookService {
 	if repo == nil {
 		panic("missing cash book repository.")
 	}

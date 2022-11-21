@@ -10,6 +10,8 @@ openapi_http:
 		-package "main" "api/openapi/user.yml" > internal/user/openapi_gen.go
 	@oapi-codegen -config ./oapi_codegen_config.yml \
 		-package "port" "api/openapi/customer.yml" > internal/customer/port/openapi_gen.go
+	@oapi-codegen -config ./oapi_codegen_client_config.yml \
+		-package "customer" "api/openapi/customer.yml" > internal/common/client/customer/openapi_gen.go
 	@oapi-codegen -config ./oapi_codegen_config.yml \
 		-package "port" "api/openapi/catalogue.yml" > internal/catalogue/port/openapi_gen.go
 	@oapi-codegen -config ./oapi_codegen_config.yml \
@@ -39,10 +41,15 @@ openapi_typescript:
 .PHONY: proto
 proto:
 	@protoc --plugin=grpc \
-		--go_out=internal/common/client \
-		--go-grpc_out=internal/common/client \
+		--go_out=internal/common/genproto \
+		--go-grpc_out=internal/common/genproto \
 		--proto_path=api/protobuf mobile.proto
 
 .PHONY: siege
 siege:
 	@siege --concurrent=3 --reps=5 --delay=0 $(url)
+
+.PHONY: test
+test:
+	@./scripts/test.sh customer
+	@./scripts/test.sh common

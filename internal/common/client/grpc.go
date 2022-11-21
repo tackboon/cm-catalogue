@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-	"github.com/tackboon/cm-catalogue/internal/common/client/mobile"
+	"github.com/tackboon/cm-catalogue/internal/common/genproto/mobile"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"

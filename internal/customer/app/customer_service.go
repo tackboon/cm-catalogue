@@ -9,19 +9,11 @@ import (
 	customer "github.com/tackboon/cm-catalogue/internal/customer/domain"
 )
 
-type customerRepository interface {
-	CreateNewCustomer(ctx context.Context, customer customer.Customer) (newID int, err error)
-	UpdateCustomerByID(ctx context.Context, customer customer.Customer) error
-	DeleteCustomerByID(ctx context.Context, customerID int) error
-	GetCustomerByID(ctx context.Context, customerID int) (customer.Customer, error)
-	GetAllCustomers(ctx context.Context, page int, limit int, filter string, relationshipFilter customer.RelationshipFilter) ([]customer.Customer, customer.Pagination, error)
-}
-
 type CustomerService struct {
-	repo customerRepository
+	repo customer.CustomerRepository
 }
 
-func NewCustomerService(repo customerRepository) CustomerService {
+func NewCustomerService(repo customer.CustomerRepository) CustomerService {
 	if repo == nil {
 		panic("missing customer repository.")
 	}
