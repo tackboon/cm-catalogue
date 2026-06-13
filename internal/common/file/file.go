@@ -34,7 +34,7 @@ func Zip(src string, w io.Writer) error {
 	zipWriter := zip.NewWriter(w)
 	defer zipWriter.Close()
 
-	buf := make([]byte, 16*1024)
+	buf := make([]byte, 1024*1024)
 	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
