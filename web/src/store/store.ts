@@ -10,9 +10,9 @@ export type RootState = ReturnType<typeof rootReducer>;
 const sagaMiddleware = createSagaMiddleware();
 
 const middlewares = [
-  process.env.NODE_ENV !== "production" && logger,
+  process.env.NODE_ENV !== "production" ? logger : undefined,
   sagaMiddleware,
-].filter((middleware): middleware is Middleware => Boolean(middleware));
+].filter(Boolean) as Middleware[];
 
 export const store = configureStore({
   reducer: rootReducer,
